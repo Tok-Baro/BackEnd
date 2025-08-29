@@ -30,13 +30,19 @@ public class JwtTokenProvider implements InitializingBean {
     private Key key;
 
     public JwtTokenProvider(
-            @Value("${jwt.secret}") String secret,
-            @Value("${jwt.token-validity}") Long tokenValidity){
+            @Value("${security.jwt.secret-key}") String secret,
+            @Value("${security.jwt.expiration}") Long tokenValidity){
         this.secret = secret;
         this.tokenValidity = tokenValidity * 1000;
     }
+
+
     @Override
     public void afterPropertiesSet() throws Exception {
+
+        logger.info("=============================================");
+        logger.info("JWT 토큰 확인 : {}", secret);
+        logger.info("=============================================");
         //Base64로 인코딩된 secret 값을 디코딩
         byte[] keyBytes = Decoders.BASE64.decode(secret);
 
@@ -50,14 +56,17 @@ public class JwtTokenProvider implements InitializingBean {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
+
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         Long now = (new Date()).getTime();
         //토큰 만료 시간 계산
         Date validity = new Date(now + this.tokenValidity);
 
         return Jwts.builder()
                 .setSubject(authentication.getName()) //사용자 이름
+                .claim("id", userPrincipal.getId()) //id 클레임 추가
                 .claim(AUTHORITIES_KEY, authorities) //권한 정보
-                .signWith(key, SignatureAlgorithm.ES512) //서명 -> 생성된 key와 HS512알고리즘 사용
+                .signWith(key, SignatureAlgorithm.HS512) //서명 -> 생성된 key와 HS512알고리즘 사용
                 .setExpiration(validity) //만료 시간
                 .compact(); //문자열 형태의 토큰으로 변환
     }
