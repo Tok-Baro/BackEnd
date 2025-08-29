@@ -1,5 +1,6 @@
 package com.api.tokbaro.domain.user.entity;
 
+import com.api.tokbaro.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -15,7 +16,7 @@ import lombok.Setter;
 /*
     출석체크 엔티티
  */
-public class Attendance {
+public class Attendance extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

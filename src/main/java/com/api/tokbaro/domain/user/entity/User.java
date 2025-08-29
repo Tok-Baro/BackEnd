@@ -1,6 +1,7 @@
 package com.api.tokbaro.domain.user.entity;
 
 import com.api.tokbaro.domain.content.entity.ContentData;
+import com.api.tokbaro.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,7 +16,7 @@ import lombok.*;
     기본유저 엔티티
     나중에 JWT, Spring Security 추가해야함
  */
-public class User {
+public class User extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,6 +28,9 @@ public class User {
 
     @Column(name = "password")
     private String password; //회원비밀번호
+
+    @Enumerated(EnumType.STRING) //Enum값을 문자열로 저장
+    private Role role;
 
 
     @OneToOne
