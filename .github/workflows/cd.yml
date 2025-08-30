@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 env:
-  IMAGE: ${{ secrets.DOCKER_USERNAME }} #[소문자로 시작하는 프로젝트명]
+  IMAGE: ${{ secrets.DOCKER_USERNAME }}/tokbaro
 
 jobs:
   deploy:
