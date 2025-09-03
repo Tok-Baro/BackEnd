@@ -29,7 +29,7 @@ public class UserController {
         userService.signUp(signUpUserReq);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
-                .body(SuccessResponse.empty());
+                .body(SuccessResponse.success("회원가입에 성공하였습니다."));
     }
 
     //로그인

@@ -7,6 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Entity
 @Getter
 @Setter
@@ -22,7 +24,6 @@ public class Attendance extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "attendance_id")
     private Long id;
-
     /*
         80점 넘어야 출석인정해준다고해서 우선 넣어둠.
         점수채우기 조건
@@ -32,14 +33,23 @@ public class Attendance extends BaseEntity {
      */
     private int dailyScore;
 
+    @Column(nullable = false)
+    private LocalDate attendanceDate;
 
-    private Boolean monday;
-    private Boolean tuesday;
-    private Boolean wednesday;
-    private Boolean thursday;
-    private Boolean friday;
-    private Boolean saturday;
-    private Boolean sunday;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     //OneToOne으로 유저와 매핑해야할 것 같음.
+//    @OneToOne
+//    @JoinColumn(name = "user_id")
+//    private User user;
+
+//    private Boolean monday;
+////    private Boolean tuesday;
+////    private Boolean wednesday;
+////    private Boolean thursday;
+////    private Boolean friday;
+////    private Boolean saturday;
+////    private Boolean sunday;
 }
