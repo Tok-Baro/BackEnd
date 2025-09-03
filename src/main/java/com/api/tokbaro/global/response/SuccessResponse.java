@@ -33,6 +33,10 @@ public class SuccessResponse<T>  extends BaseResponse {
         return new SuccessResponse<>(null, SuccessResponseCode.SUCCESS_OK);
     }
 
+    public static SuccessResponse<?> success(String message) { //data X, message 커스텀
+        return new SuccessResponse<>(null, SuccessResponseCode.SUCCESS_CREATED,message);
+    }
+
     public static SuccessResponse<?> emptyCustom (String message) { // data X, message 커스텀
         return new SuccessResponse<>(null, SuccessResponseCode.SUCCESS_OK, message);
     }

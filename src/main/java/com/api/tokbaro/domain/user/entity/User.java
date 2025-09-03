@@ -5,13 +5,15 @@ import com.api.tokbaro.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-
+@Table(name = "users")
 /*
     기본유저 엔티티
     나중에 JWT, Spring Security 추가해야함
@@ -33,11 +35,19 @@ public class User extends BaseEntity {
     private Role role;
 
 
-    @OneToOne
-    @JoinColumn(name = "attendance_id")
-    private Attendance attendance;
-
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Attendance> attendanceList;
+//    @OneToOne
+//    @JoinColumn(name = "attendance_id")
+//    private Attendance attendance;
+//
     @OneToOne
     @JoinColumn(name = "content_data_id")
     private ContentData contentData;
+
+    //연관관계 편의 메서드
+    public void addAttendance(Attendance attendance) {
+        this.attendanceList.add(attendance);
+        attendance.setUser(this);
+    }
 }
