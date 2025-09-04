@@ -37,13 +37,10 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Attendance> attendanceList;
+
 //    @OneToOne
-//    @JoinColumn(name = "attendance_id")
-//    private Attendance attendance;
-//
-    @OneToOne
-    @JoinColumn(name = "content_data_id")
-    private ContentData contentData;
+//    @JoinColumn(name = "content_data_id")
+//    private ContentData contentData;
 
     //연관관계 편의 메서드
     public void addAttendance(Attendance attendance) {
