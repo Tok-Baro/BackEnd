@@ -23,9 +23,9 @@ public class ContentDataController {
 
     @PostMapping("/users/me/reactions")
     public ResponseEntity<SuccessResponse<?>> saveReactionVelocity(
-            @AuthenticationPrincipal UserPrincipal userPrincipal,
+            Long userId,
             @RequestBody ReactionReq reactionReq){
-        contentDataService.saveReactionVelocity(userPrincipal, reactionReq);
+        contentDataService.saveReactionVelocity(userId, reactionReq);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(SuccessResponse.success("데이터 저장에 성공했습니다."));

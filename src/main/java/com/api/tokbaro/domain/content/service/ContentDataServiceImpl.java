@@ -19,8 +19,8 @@ public class ContentDataServiceImpl implements ContentDataService {
     private final UserRepository userRepository;
 
     @Override
-    public void saveReactionVelocity(UserPrincipal userPrincipal, ReactionReq reactionReq) {
-        User user = userRepository.findById(userPrincipal.getId())
+    public void saveReactionVelocity(Long userId, ReactionReq reactionReq) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(()-> new CustomException(UserErrorResponseCode.USER_NOT_FOUND_404));
 
         ContentData contentData = new ContentData();
