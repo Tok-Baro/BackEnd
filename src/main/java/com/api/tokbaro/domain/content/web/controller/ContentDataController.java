@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,9 +18,9 @@ public class ContentDataController {
 
     private final ContentDataService contentDataService;
 
-    @PostMapping("/users/me/reactions")
+    @PostMapping("/users/me/reactions/{userId}")
     public ResponseEntity<SuccessResponse<?>> saveReactionVelocity(
-            Long userId,
+            @PathVariable Long userId,
             @RequestBody ReactionReq reactionReq){
         contentDataService.saveReactionVelocity(userId, reactionReq);
         return ResponseEntity
