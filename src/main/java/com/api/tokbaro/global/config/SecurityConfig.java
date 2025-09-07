@@ -50,6 +50,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST,"/api/users/me/attendances").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET,"/api/users/me/attendances").hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/users/me/reactions/**").permitAll()
+                        .requestMatchers("/api/apns/**").permitAll()
 
                         .anyRequest().authenticated()
                 )
