@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -142,7 +143,7 @@ public class ApnsServiceImpl implements ApnsService {
             @Override
             public Instant getExpiration() {
                 // 만료 시간을 null로 명시적으로 반환
-                return null;
+                return Instant.now().plus(10, ChronoUnit.MINUTES);
             }
 
             @Override
