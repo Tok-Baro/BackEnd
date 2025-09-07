@@ -156,7 +156,7 @@ public class ApnsServiceImpl implements ApnsService {
 
             @Override
             public PushType getPushType() {
-                return null;
+                return PushType.LIVE_ACTIVITY;
             }
 
             @Override
