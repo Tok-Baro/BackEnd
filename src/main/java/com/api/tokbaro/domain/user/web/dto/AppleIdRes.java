@@ -1,7 +1,6 @@
 package com.api.tokbaro.domain.user.web.dto;
 
-public record SignInUserRes(
-        String grantType,
+public record AppleIdRes(
         String accessToken,
         String refreshToken
 ) {

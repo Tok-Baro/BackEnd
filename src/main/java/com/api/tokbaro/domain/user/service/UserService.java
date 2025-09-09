@@ -1,9 +1,9 @@
 package com.api.tokbaro.domain.user.service;
 
-import com.api.tokbaro.domain.user.web.dto.SignInUserReq;
-import com.api.tokbaro.domain.user.web.dto.SignInUserRes;
-import com.api.tokbaro.domain.user.web.dto.SignUpUserReq;
+import com.api.tokbaro.domain.user.web.dto.*;
 
 public interface UserService {
     void signUp(SignUpUserReq signUpUserReq);
+    SignInUserRes signIn(SignInUserReq signInUserReq);
+    SignInUserRes appleLogin(AppleIdReq appleIdReq);
 }
