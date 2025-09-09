@@ -60,9 +60,9 @@ public class ApnsServiceImpl implements ApnsService {
             return new ApnsRes(404, errorMessage);
         }
         Map<String, Object> contentState = createContentState(stateReq);
-        return sendNotification(token, contentState, null, 5);
+        return sendNotification(token, contentState, null, 10);
     }
-
+ // priority = 10 (즉시 전송) , 5 = (전력 효율적 전송) 배터리 관리 때문에 있는듯
     @Override
     public ApnsRes sendPostureAlert(StateReq stateReq) {
         String token = activityTokens.get(stateReq.getActivityId());
