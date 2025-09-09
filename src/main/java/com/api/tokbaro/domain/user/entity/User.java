@@ -31,6 +31,12 @@ public class User extends BaseEntity {
     @Column(name = "password")
     private String password; //회원비밀번호
 
+    @Column(name = "apple_id")
+    private String appleId; //애플 로그인 사용자 고유 ID
+
+    @Column(name = "refresh_token")
+    private String refreshToken;
+
     @Enumerated(EnumType.STRING) //Enum값을 문자열로 저장
     private Role role;
 
