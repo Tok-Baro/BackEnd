@@ -39,6 +39,7 @@ jobs:
             docker run -d --name tokbaro \
               --env-file /home/${{ secrets.SERVER_USER }}/.env \
               -p 8080:8080 \
+              -v /opt/apns/keys/AuthKey_R687V74YYB.p8:/app/keys/AuthKey.p8 \
               ${{ env.IMAGE }}:latest
             
             

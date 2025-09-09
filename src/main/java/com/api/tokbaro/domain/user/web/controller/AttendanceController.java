@@ -34,6 +34,7 @@ public class AttendanceController {
     }
 
     //출석체크 조회
+    //http://localhost:8080/api/users/me/attendances?startDate=2025-09-01&endDate=2025-09-30 이런 느낌
     @GetMapping("/users/me/attendances")
     public ResponseEntity<SuccessResponse<?>> getAttendance(
             @AuthenticationPrincipal UserPrincipal userPrincipal,

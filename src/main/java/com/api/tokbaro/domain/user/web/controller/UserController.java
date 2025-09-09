@@ -1,6 +1,7 @@
 package com.api.tokbaro.domain.user.web.controller;
 
 import com.api.tokbaro.domain.user.service.UserService;
+import com.api.tokbaro.domain.user.web.dto.AppleIdReq;
 import com.api.tokbaro.domain.user.web.dto.SignInUserReq;
 import com.api.tokbaro.domain.user.web.dto.SignInUserRes;
 import com.api.tokbaro.domain.user.web.dto.SignUpUserReq;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -35,27 +37,28 @@ public class UserController {
     //로그인
     @PostMapping("/login")
     public ResponseEntity<SuccessResponse<?>> signIn(@RequestBody SignInUserReq signInUserReq){
-
-        //사용자 이름/PW를 기반으로 인증용 객체 생성
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(signInUserReq.getUsername(), signInUserReq.getPassword());
-
-        //실제 검증
-        //authenticate() 메소드 실행 시 CustomUserDetailsService의 loadUserByUsername() 메소드가 실행되어 사용자 조회 및 비밀번호비교
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-
-        //인증 정보를 기반으로 JWT 토큰 생성
-        String jwt = jwtTokenProvider.createToken(authentication);
-
-        SignInUserRes signInUserRes = new SignInUserRes("Bearer", jwt);
-
+        SignInUserRes tokens = userService.signIn(signInUserReq);
         //생성된 토큰을 res에 담아 응답
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(SuccessResponse.ok(signInUserRes));
+                .body(SuccessResponse.ok(tokens));
     }
 
     //로그아웃
     //@DeleteMapping("logout")
 
+    //애플 ID로 로그인/회원가입
+    /*
+        받아오는 데이터
+            private String identityToken; //사용자 토큰, 애플이 발급한 JWT
+            private String givenName; //이름
+            private String familyName; //이름 : 성
+     */
+    @PostMapping("/applelogin")
+    public ResponseEntity<SuccessResponse<?>> appleLogin(@RequestBody AppleIdReq appleIdReq){
+        SignInUserRes tokens = userService.appleLogin(appleIdReq);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.ok(tokens));
+    }
 }

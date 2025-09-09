@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -59,9 +60,9 @@ public class ApnsServiceImpl implements ApnsService {
             return new ApnsRes(404, errorMessage);
         }
         Map<String, Object> contentState = createContentState(stateReq);
-        return sendNotification(token, contentState, null, 5);
+        return sendNotification(token, contentState, null, 10);
     }
-
+ // priority = 10 (즉시 전송) , 5 = (전력 효율적 전송) 배터리 관리 때문에 있는듯
     @Override
     public ApnsRes sendPostureAlert(StateReq stateReq) {
         String token = activityTokens.get(stateReq.getActivityId());
@@ -117,6 +118,7 @@ public class ApnsServiceImpl implements ApnsService {
             return new ApnsRes(500, "페이로드 직렬화 실패 " + e.getMessage());
         }
 
+        log.info("전달된 페이로드: {}", payload);
         final com.eatthepath.pushy.apns.DeliveryPriority deliveryPriority = priority == 5 ?
                 com.eatthepath.pushy.apns.DeliveryPriority.CONSERVE_POWER :
                 com.eatthepath.pushy.apns.DeliveryPriority.IMMEDIATE;
@@ -141,7 +143,7 @@ public class ApnsServiceImpl implements ApnsService {
             @Override
             public Instant getExpiration() {
                 // 만료 시간을 null로 명시적으로 반환
-                return null;
+                return Instant.now().plus(10, ChronoUnit.MINUTES);
             }
 
             @Override
@@ -156,7 +158,7 @@ public class ApnsServiceImpl implements ApnsService {
 
             @Override
             public PushType getPushType() {
-                return null;
+                return PushType.LIVE_ACTIVITY;
             }
 
             @Override
