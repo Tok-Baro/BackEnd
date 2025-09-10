@@ -13,6 +13,7 @@ import com.nimbusds.jose.proc.BadJOSEException;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.proc.BadJWTException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -27,6 +28,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
@@ -76,6 +78,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public SignInUserRes appleLogin(AppleIdReq appleIdReq) {
 
+        log.info("appleLogin 호출완료");
         //Apple identityToken 검증
         JWTClaimsSet claims;
         try{

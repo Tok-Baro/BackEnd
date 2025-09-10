@@ -8,6 +8,7 @@ import com.api.tokbaro.domain.user.web.dto.SignUpUserReq;
 import com.api.tokbaro.global.jwt.JwtTokenProvider;
 import com.api.tokbaro.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
+@Slf4j
 public class UserController {
 
     private final UserService userService;
@@ -56,6 +58,7 @@ public class UserController {
      */
     @PostMapping("/applelogin")
     public ResponseEntity<SuccessResponse<?>> appleLogin(@RequestBody AppleIdReq appleIdReq){
+        log.info("애플 로그인 API 호출 성공");
         SignInUserRes tokens = userService.appleLogin(appleIdReq);
         return ResponseEntity
                 .status(HttpStatus.OK)
