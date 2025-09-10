@@ -83,6 +83,7 @@ public class UserServiceImpl implements UserService {
         JWTClaimsSet claims;
         try{
             claims = appleJwtVerifier.verify(appleIdReq.getIdentityToken());
+            log.info("Apple identityToken claims: {}", claims.getClaims().toString());
         }catch (BadJOSEException e){
             throw new CustomException(UserErrorResponseCode.INVALID_APPLE_ID_TOKEN_401);
         }
@@ -108,7 +109,6 @@ public class UserServiceImpl implements UserService {
             if(userRepository.existsByUsername(email)){
                 throw new CustomException(UserErrorResponseCode.DUPLICATE_USERNAME_409);
             }
-
             user = User.builder()
                     .username(email)
                     .appleId(appleId)
