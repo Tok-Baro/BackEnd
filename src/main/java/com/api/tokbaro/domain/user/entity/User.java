@@ -25,6 +25,9 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     private Long id;
 
+    @Column(name = "email")
+    private String email;
+
     @Column(name = "username")
     private String username; //회원이름
 
@@ -34,7 +37,7 @@ public class User extends BaseEntity {
     @Column(name = "apple_id")
     private String appleId; //애플 로그인 사용자 고유 ID
 
-    @Column(name = "refresh_token")
+    @Column(name = "refresh_token") //JWT 리프레쉬 토큰
     private String refreshToken;
 
     @Enumerated(EnumType.STRING) //Enum값을 문자열로 저장
@@ -44,9 +47,6 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Attendance> attendanceList;
 
-//    @OneToOne
-//    @JoinColumn(name = "content_data_id")
-//    private ContentData contentData;
 
     //연관관계 편의 메서드
     public void addAttendance(Attendance attendance) {
