@@ -90,12 +90,7 @@ public class UserServiceImpl implements UserService {
 
         //claims에서 appleId와 email 추출
         String appleId = claims.getSubject();
-        String email;
-        try {
-            email = claims.getStringClaim("email");
-        } catch (ParseException e) {
-            throw new CustomException(UserErrorResponseCode.INVALID_APPLE_ID_TOKEN_401);
-        }
+        String email = appleIdReq.getEmail();
 
         //appleId로 사용자 조회
         Optional<User> appleUser = userRepository.findByAppleId(appleId);
@@ -109,8 +104,10 @@ public class UserServiceImpl implements UserService {
             if(userRepository.existsByUsername(email)){
                 throw new CustomException(UserErrorResponseCode.DUPLICATE_USERNAME_409);
             }
+            String username = appleIdReq.getFamilyName() + appleIdReq.getGivenName();
             user = User.builder()
-                    .username(email)
+                    .email(email)
+                    .username(username)
                     .appleId(appleId)
                     .role(Role.USER)
                     .build();
