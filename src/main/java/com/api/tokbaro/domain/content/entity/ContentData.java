@@ -23,11 +23,14 @@ public class ContentData {
         유저 반응속도 저장필드
         ex) 100ms, 183ms
      */
+    @Column(name = "user_Reaction_velocity")
     private double userReactionVelocity;
+
+    //APNs로 자세 경고를 받은 횟수
+    @Column(name = "alert_count")
+    private int alertCount;
 
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
-
-    //OneToOne으로 User와 매핑해야할 것 같음.
 }
