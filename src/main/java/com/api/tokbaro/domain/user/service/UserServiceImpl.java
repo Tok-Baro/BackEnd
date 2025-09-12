@@ -119,6 +119,7 @@ public class UserServiceImpl implements UserService {
                 user.getId(),
                 user.getUsername(),
                 null,
+                //iOS도 ROLE_USER로 역할이 인식되게 해주어야한다.
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
         );
 
