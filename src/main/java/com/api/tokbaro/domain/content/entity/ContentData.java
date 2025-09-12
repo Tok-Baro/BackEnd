@@ -2,14 +2,12 @@ package com.api.tokbaro.domain.content.entity;
 
 import com.api.tokbaro.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ContentData {
@@ -27,8 +25,9 @@ public class ContentData {
     private double userReactionVelocity;
 
     //APNs로 자세 경고를 받은 횟수
+    @Builder.Default
     @Column(name = "alert_count")
-    private int alertCount;
+    private int alertCount = 0;
 
     @OneToOne
     @JoinColumn(name = "user_id")
