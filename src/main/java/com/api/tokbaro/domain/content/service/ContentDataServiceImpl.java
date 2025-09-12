@@ -37,7 +37,7 @@ public class ContentDataServiceImpl implements ContentDataService {
                 .orElseGet(()-> ContentData.builder().user(user).build());
 
         //기존 기록이 없거나(0.0), 새로 온 기록이 더 좋으면 업데이트한다.
-        if(contentData.getUserReactionVelocity()==0.0 || //처음엔 double은 초기화안하면 명시적으로 0.0으로 자동 초기화됨.
+        if(contentData.getUserReactionVelocity()==null || //처음엔 double은 초기화안하면 명시적으로 0.0으로 자동 초기화됨.
                 contentData.getUserReactionVelocity() > reactionReq.getReactionVelocity()) {
             contentData.setUserReactionVelocity(reactionReq.getReactionVelocity());
         }

@@ -22,14 +22,24 @@ public class ContentData {
         ex) 100ms, 183ms
      */
     @Column(name = "user_Reaction_velocity")
-    private double userReactionVelocity;
+    private Double userReactionVelocity;
 
     //APNs로 자세 경고를 받은 횟수
     @Builder.Default
     @Column(name = "alert_count")
-    private int alertCount = 0;
+    private Integer alertCount = 0;
 
     @OneToOne
     @JoinColumn(name = "user_id")
     private User user;
+
+    @PrePersist
+    public void prePersist() {
+        if(userReactionVelocity==null) {
+            userReactionVelocity = 0.0;
+        }
+        if(alertCount==null) {
+            alertCount = 0;
+        }
+    }
 }
