@@ -9,6 +9,7 @@ import com.api.tokbaro.domain.user.repository.UserRepository;
 import com.api.tokbaro.global.exception.CustomException;
 import com.api.tokbaro.global.jwt.UserPrincipal;
 import com.api.tokbaro.global.response.code.user.UserErrorResponseCode;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -26,31 +27,22 @@ public class ContentDataServiceImpl implements ContentDataService {
     private final UserRepository userRepository;
 
     @Override
+    @Transactional
     public void saveReactionVelocity(Long userId, ReactionReq reactionReq) {
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new CustomException(UserErrorResponseCode.USER_NOT_FOUND_404));
 
-        //사용자 ID를 사용해 반응속도 데이터 조회
-        Optional<ContentData> optionalContentData = contentDataRepository.findByUserId(userId);
+        //userID로 ContentData를 찾고 없다면 새로 생성한다.
+        ContentData contentData = contentDataRepository.findByUserId(userId)
+                .orElseGet(()-> ContentData.builder().user(user).build());
 
-        //기존 데이터가 있는지 확인
-        if(optionalContentData.isPresent()) {
-            //기존 데이터 있다면 가져옴
-            ContentData contentData = optionalContentData.get();
-
-            //반응속도 비교(이전 기록, 현재 기록)
-            if(contentData.getUserReactionVelocity() > reactionReq.getReactionVelocity()) {
-                contentData.setUserReactionVelocity(reactionReq.getReactionVelocity());
-                contentDataRepository.save(contentData);
-            }
-        }
-        else{ //기록이 없는 경우
-            ContentData contentData = new ContentData();
+        //기존 기록이 없거나(0.0), 새로 온 기록이 더 좋으면 업데이트한다.
+        if(contentData.getUserReactionVelocity()==0.0 || //처음엔 double은 초기화안하면 명시적으로 0.0으로 자동 초기화됨.
+                contentData.getUserReactionVelocity()<reactionReq.getReactionVelocity()) {
             contentData.setUserReactionVelocity(reactionReq.getReactionVelocity());
-            contentData.setUser(user);
-
-            contentDataRepository.save(contentData);
         }
+
+        contentDataRepository.save(contentData);
     }
 
     @Override
