@@ -119,7 +119,7 @@ public class UserServiceImpl implements UserService {
                 user.getId(),
                 user.getUsername(),
                 null,
-                Collections.singleton(new SimpleGrantedAuthority(user.getRole().name()))
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
         );
 
         //Authentication 객체 생성
