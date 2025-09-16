@@ -18,6 +18,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -136,6 +137,53 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         return tokens;
 
+    }
+
+    @Override
+    @Transactional
+    public SignInUserRes reissue(ReissueReq reissueReq) {
+
+        //1. RefreshToken 검증
+        if(!jwtTokenProvider.validateToken(reissueReq.getRefreshToken())){
+            throw new CustomException(UserErrorResponseCode.INVAILD_REFRESH_TOKEN_401);
+        }
+
+        //2. RefreshToken으로 사용자 조회
+        User user = userRepository.findByRefreshToken(reissueReq.getRefreshToken())
+                .orElseThrow(()->new CustomException(UserErrorResponseCode.USER_NOT_FOUND_FOR_TOKEN_404));
+
+        //새로운 토큰을 위한 Authentication 객체 생성
+        UserPrincipal userPrincipal = new UserPrincipal(
+                user.getId(),
+                user.getUsername(),
+                null,
+                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
+        );
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                userPrincipal,
+                null,
+                userPrincipal.getAuthorities());
+
+        //새로운 토큰 생성
+        SignInUserRes newTokens = jwtTokenProvider.createTokens(authentication);
+        user.setRefreshToken(newTokens.refreshToken());
+        userRepository.save(user);
+
+        return newTokens;
+    }
+
+    @Override
+    @Transactional
+    public void logout() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserPrincipal userprincipal = (UserPrincipal) authentication.getPrincipal();
+        Long userId = userprincipal.getId();
+        User user = userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(UserErrorResponseCode.USER_NOT_FOUND_404));
+
+        user.setRefreshToken(null);
+        userRepository.save(user);
     }
 
 }

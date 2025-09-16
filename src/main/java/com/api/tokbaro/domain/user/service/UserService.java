@@ -6,4 +6,8 @@ public interface UserService {
     void signUp(SignUpUserReq signUpUserReq);
     SignInUserRes signIn(SignInUserReq signInUserReq);
     SignInUserRes appleLogin(AppleIdReq appleIdReq);
+
+    SignInUserRes reissue(ReissueReq reissueReq);
+
+    void logout();
 }

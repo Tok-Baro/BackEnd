@@ -46,14 +46,12 @@ public class SecurityConfig {
                 //HTTP 요청 인가 규칙 설정
                 .authorizeHttpRequests(authorize -> authorize
                         //아래 경로에 대해서는 인증 없이 접근 허용)
-                        .requestMatchers("/api/users", "/api/login").permitAll()
+                        .requestMatchers("/api/users", "/api/login","/api/applelogin",
+                                "/api/auth/reissue","/api/apns/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/users/me/attendances").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET,"/api/users/me/attendances").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST,"/api/users/me/reactions").hasAnyRole("USER","ADMIN")
                         .requestMatchers(HttpMethod.GET,"/api/users/me/reactions").hasAnyRole("USER","ADMIN")
-                        .requestMatchers("/api/apns/**").permitAll()
-                        .requestMatchers("/api/applelogin").permitAll()
-
                         .anyRequest().authenticated()
                 )
 
