@@ -1,10 +1,7 @@
 package com.api.tokbaro.domain.user.web.controller;
 
 import com.api.tokbaro.domain.user.service.UserService;
-import com.api.tokbaro.domain.user.web.dto.AppleIdReq;
-import com.api.tokbaro.domain.user.web.dto.SignInUserReq;
-import com.api.tokbaro.domain.user.web.dto.SignInUserRes;
-import com.api.tokbaro.domain.user.web.dto.SignUpUserReq;
+import com.api.tokbaro.domain.user.web.dto.*;
 import com.api.tokbaro.global.jwt.JwtTokenProvider;
 import com.api.tokbaro.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -47,7 +44,13 @@ public class UserController {
     }
 
     //로그아웃
-    //@DeleteMapping("logout")
+    @PostMapping("/logout")
+    public ResponseEntity<SuccessResponse<?>> logout(){
+        userService.logout();
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.emptyCustom("로그아웃에 성공하였습니다."));
+    }
 
     //애플 ID로 로그인/회원가입
     /*
@@ -60,6 +63,14 @@ public class UserController {
     public ResponseEntity<SuccessResponse<?>> appleLogin(@RequestBody AppleIdReq appleIdReq){
         log.info("애플 로그인 API 호출 성공");
         SignInUserRes tokens = userService.appleLogin(appleIdReq);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.ok(tokens));
+    }
+
+    @PostMapping("/auth/reissue")
+    public ResponseEntity<SuccessResponse<?>> reissue(@RequestBody ReissueReq reissueReq){
+        SignInUserRes tokens = userService.reissue(reissueReq);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.ok(tokens));
