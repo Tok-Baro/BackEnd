@@ -1,5 +1,10 @@
 package com.api.tokbaro.domain.user.service;
 
+import com.api.tokbaro.domain.apns.service.ApnsService;
+import com.api.tokbaro.domain.apns.web.dto.ApnsRes;
+import com.api.tokbaro.domain.apns.web.dto.StateReq;
+import com.api.tokbaro.domain.content.entity.ContentData;
+import com.api.tokbaro.domain.content.repository.ContentDataRepository;
 import com.api.tokbaro.domain.user.entity.Role;
 import com.api.tokbaro.domain.user.entity.User;
 import com.api.tokbaro.domain.user.repository.UserRepository;
@@ -37,6 +42,8 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AppleJwtVerifier appleJwtVerifier;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final ContentDataRepository contentDataRepository;
+    private final ApnsService apnsService;
 
     @Override
     @Transactional
@@ -184,6 +191,18 @@ public class UserServiceImpl implements UserService {
 
         user.setRefreshToken(null);
         userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public ApnsRes handlePostureAlert(Long userId,  StateReq stateReq) {
+        ContentData contentData = contentDataRepository.findByUserId(userId)
+                .orElseThrow(()->new CustomException(UserErrorResponseCode.CONTENT_DATA_NOT_FOUND_404));
+
+        //contentData.setAlertCount(contentData.getAlertCount() + 1);
+        contentData.increaseAlertCount();
+
+        return apnsService.sendPostureAlert(stateReq);
     }
 
 }
