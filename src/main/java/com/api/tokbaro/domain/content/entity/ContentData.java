@@ -42,4 +42,11 @@ public class ContentData {
             alertCount = 0;
         }
     }
+
+    public void increaseAlertCount() {
+        if(this.alertCount==null){
+            this.alertCount=0;
+        }
+        this.alertCount++;
+    }
 }
