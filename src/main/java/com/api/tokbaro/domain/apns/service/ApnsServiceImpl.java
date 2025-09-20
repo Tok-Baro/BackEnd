@@ -118,7 +118,7 @@ public class ApnsServiceImpl implements ApnsService {
             return new ApnsRes(500, "페이로드 직렬화 실패 " + e.getMessage());
         }
 
-        log.info("전달된 페이로드: {}", payload);
+        //log.info("전달된 페이로드: {}", payload);
         final com.eatthepath.pushy.apns.DeliveryPriority deliveryPriority = priority == 5 ?
                 com.eatthepath.pushy.apns.DeliveryPriority.CONSERVE_POWER :
                 com.eatthepath.pushy.apns.DeliveryPriority.IMMEDIATE;
