@@ -182,10 +182,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void logout() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        UserPrincipal userprincipal = (UserPrincipal) authentication.getPrincipal();
-        Long userId = userprincipal.getId();
+    public void logout(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(UserErrorResponseCode.USER_NOT_FOUND_404));
 

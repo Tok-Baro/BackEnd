@@ -3,6 +3,7 @@ package com.api.tokbaro.domain.user.web.controller;
 import com.api.tokbaro.domain.user.service.UserService;
 import com.api.tokbaro.domain.user.web.dto.*;
 import com.api.tokbaro.global.jwt.JwtTokenProvider;
+import com.api.tokbaro.global.jwt.UserPrincipal;
 import com.api.tokbaro.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,8 +47,8 @@ public class UserController {
 
     //로그아웃
     @PostMapping("/logout")
-    public ResponseEntity<SuccessResponse<?>> logout(){
-        userService.logout();
+    public ResponseEntity<SuccessResponse<?>> logout(@AuthenticationPrincipal UserPrincipal userPrincipal){
+        userService.logout(userPrincipal.getId());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.emptyCustom("로그아웃에 성공하였습니다."));
