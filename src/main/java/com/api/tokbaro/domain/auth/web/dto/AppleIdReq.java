@@ -1,4 +1,4 @@
-package com.api.tokbaro.domain.user.web.dto;
+package com.api.tokbaro.domain.auth.web.dto;
 
 import lombok.Getter;
 
