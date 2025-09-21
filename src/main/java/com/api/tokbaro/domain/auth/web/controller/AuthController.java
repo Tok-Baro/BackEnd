@@ -19,9 +19,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping("/api/auth")
 public class AuthController {
-    private final UserService userService;
     private final AuthService authService;
 
     //로그인
@@ -58,7 +57,7 @@ public class AuthController {
                 .body(SuccessResponse.ok(tokens));
     }
 
-    @PostMapping("/auth/reissue")
+    @PostMapping("/reissue")
     public ResponseEntity<SuccessResponse<?>> reissue(@RequestBody ReissueReq reissueReq) {
         SignInUserRes tokens = authService.reissue(reissueReq);
         return ResponseEntity
