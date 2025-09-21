@@ -64,6 +64,23 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
+    public User signUpWithApple(String appleId, String email, String username) {
+        if(userRepository.existsByEmail(email)){
+            throw new CustomException(UserErrorResponseCode.DUPLICATE_EMAIL_409);
+        }
+
+        User user = User.builder()
+                .email(email)
+                .username(username)
+                .appleId(appleId)
+                .role(Role.USER)
+                .build();
+
+        return userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
     public ApnsRes handlePostureAlert(Long userId,  StateReq stateReq) {
         ContentData contentData = contentDataRepository.findByUserId(userId)
                 .orElseThrow(()->new CustomException(UserErrorResponseCode.CONTENT_DATA_NOT_FOUND_404));
