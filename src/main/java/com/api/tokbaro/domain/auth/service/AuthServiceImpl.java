@@ -7,6 +7,7 @@ import com.api.tokbaro.domain.auth.web.dto.SignInUserRes;
 import com.api.tokbaro.domain.user.entity.Role;
 import com.api.tokbaro.domain.user.entity.User;
 import com.api.tokbaro.domain.user.repository.UserRepository;
+import com.api.tokbaro.domain.user.service.UserService;
 import com.api.tokbaro.global.exception.CustomException;
 import com.api.tokbaro.global.jwt.AppleJwtVerifier;
 import com.api.tokbaro.global.jwt.JwtTokenProvider;
@@ -35,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final UserRepository userRepository;
     private final AppleJwtVerifier appleJwtVerifier;
+    private final UserService userService;
 
     //일반 로그인
     @Override
@@ -80,18 +82,8 @@ public class AuthServiceImpl implements AuthService {
             user = appleUser.get();
         } else {
             //신규 사용자인 경우 (회원가입으로)
-            if(userRepository.existsByUsername(email)){
-                throw new CustomException(UserErrorResponseCode.DUPLICATE_USERNAME_409);
-            }
             String username = appleIdReq.getFamilyName() + appleIdReq.getGivenName();
-            user = User.builder()
-                    .email(email)
-                    .username(username)
-                    .appleId(appleId)
-                    .role(Role.USER)
-                    .build();
-
-            userRepository.save(user);
+            user = userService.signUpWithApple(appleId,email,username);
         }
 
         UserPrincipal userPrincipal = new UserPrincipal(
@@ -122,7 +114,7 @@ public class AuthServiceImpl implements AuthService {
     public SignInUserRes reissue(ReissueReq reissueReq) {
         //1. RefreshToken 검증
         if(!jwtTokenProvider.validateToken(reissueReq.getRefreshToken())){
-            throw new CustomException(UserErrorResponseCode.INVAILD_REFRESH_TOKEN_401);
+            throw new CustomException(UserErrorResponseCode.INVALID_REFRESH_TOKEN_401);
         }
 
         //2. RefreshToken으로 사용자 조회
