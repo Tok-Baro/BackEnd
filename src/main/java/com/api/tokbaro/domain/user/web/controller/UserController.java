@@ -32,47 +32,4 @@ public class UserController {
                 .status(HttpStatus.CREATED)
                 .body(SuccessResponse.success("회원가입에 성공하였습니다."));
     }
-
-    //로그인
-    @PostMapping("/login")
-    public ResponseEntity<SuccessResponse<?>> signIn(@RequestBody SignInUserReq signInUserReq){
-        SignInUserRes tokens = userService.signIn(signInUserReq);
-        //생성된 토큰을 res에 담아 응답
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(SuccessResponse.ok(tokens));
-    }
-
-    //로그아웃
-    @PostMapping("/logout")
-    public ResponseEntity<SuccessResponse<?>> logout(@AuthenticationPrincipal UserPrincipal userPrincipal){
-        userService.logout(userPrincipal.getId());
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(SuccessResponse.emptyCustom("로그아웃에 성공하였습니다."));
-    }
-
-    //애플 ID로 로그인/회원가입
-    /*
-        받아오는 데이터
-            private String identityToken; //사용자 토큰, 애플이 발급한 JWT
-            private String givenName; //이름
-            private String familyName; //이름 : 성
-     */
-    @PostMapping("/applelogin")
-    public ResponseEntity<SuccessResponse<?>> appleLogin(@RequestBody AppleIdReq appleIdReq){
-        log.info("애플 로그인 API 호출 성공");
-        SignInUserRes tokens = userService.appleLogin(appleIdReq);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(SuccessResponse.ok(tokens));
-    }
-
-    @PostMapping("/auth/reissue")
-    public ResponseEntity<SuccessResponse<?>> reissue(@RequestBody ReissueReq reissueReq){
-        SignInUserRes tokens = userService.reissue(reissueReq);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(SuccessResponse.ok(tokens));
-    }
 }

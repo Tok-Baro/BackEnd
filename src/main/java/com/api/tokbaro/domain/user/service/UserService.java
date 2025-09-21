@@ -6,12 +6,6 @@ import com.api.tokbaro.domain.user.web.dto.*;
 
 public interface UserService {
     void signUp(SignUpUserReq signUpUserReq);
-    SignInUserRes signIn(SignInUserReq signInUserReq);
-    SignInUserRes appleLogin(AppleIdReq appleIdReq);
-
-    SignInUserRes reissue(ReissueReq reissueReq);
-
-    void logout(Long userId);
 
     //APNsServierImpl에는 알람전송기능이라는 단일책임을 부여하기 위함.
     ApnsRes handlePostureAlert(Long userId, StateReq stateReq);
