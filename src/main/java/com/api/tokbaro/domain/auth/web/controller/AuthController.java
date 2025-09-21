@@ -1,5 +1,10 @@
 package com.api.tokbaro.domain.auth.web.controller;
 
+import com.api.tokbaro.domain.auth.service.AuthService;
+import com.api.tokbaro.domain.auth.web.dto.AppleIdReq;
+import com.api.tokbaro.domain.auth.web.dto.ReissueReq;
+import com.api.tokbaro.domain.auth.web.dto.SignInUserReq;
+import com.api.tokbaro.domain.auth.web.dto.SignInUserRes;
 import com.api.tokbaro.domain.user.service.UserService;
 import com.api.tokbaro.global.jwt.UserPrincipal;
 import com.api.tokbaro.global.response.SuccessResponse;
@@ -17,11 +22,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api")
 public class AuthController {
     private final UserService userService;
+    private final AuthService authService;
 
     //로그인
     @PostMapping("/login")
     public ResponseEntity<SuccessResponse<?>> signIn(@RequestBody SignInUserReq signInUserReq){
-        SignInUserRes tokens = userService.signIn(signInUserReq);
+        SignInUserRes tokens = authService.signIn(signInUserReq);
         //생성된 토큰을 res에 담아 응답
         return ResponseEntity
                 .status(HttpStatus.OK)
@@ -30,8 +36,8 @@ public class AuthController {
 
     //로그아웃
     @PostMapping("/logout")
-    public ResponseEntity<SuccessResponse<?>> logout(@AuthenticationPrincipal UserPrincipal userPrincipal){
-        userService.logout(userPrincipal.getId());
+    public ResponseEntity<SuccessResponse<?>> logout(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        authService.logout(userPrincipal.getId());
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.emptyCustom("로그아웃에 성공하였습니다."));
@@ -46,15 +52,15 @@ public class AuthController {
      */
     @PostMapping("/applelogin")
     public ResponseEntity<SuccessResponse<?>> appleLogin(@RequestBody AppleIdReq appleIdReq){
-        SignInUserRes tokens = userService.appleLogin(appleIdReq);
+        SignInUserRes tokens = authService.appleLogin(appleIdReq);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.ok(tokens));
     }
 
     @PostMapping("/auth/reissue")
-    public ResponseEntity<SuccessResponse<?>> reissue(@RequestBody ReissueReq reissueReq){
-        SignInUserRes tokens = userService.reissue(reissueReq);
+    public ResponseEntity<SuccessResponse<?>> reissue(@RequestBody ReissueReq reissueReq) {
+        SignInUserRes tokens = authService.reissue(reissueReq);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.ok(tokens));
