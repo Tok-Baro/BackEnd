@@ -1,10 +1,7 @@
 package com.api.tokbaro.domain.auth.web.controller;
 
 import com.api.tokbaro.domain.auth.service.AuthService;
-import com.api.tokbaro.domain.auth.web.dto.AppleIdReq;
-import com.api.tokbaro.domain.auth.web.dto.ReissueReq;
-import com.api.tokbaro.domain.auth.web.dto.SignInUserReq;
-import com.api.tokbaro.domain.auth.web.dto.SignInUserRes;
+import com.api.tokbaro.domain.auth.web.dto.*;
 import com.api.tokbaro.domain.user.service.UserService;
 import com.api.tokbaro.global.jwt.UserPrincipal;
 import com.api.tokbaro.global.response.SuccessResponse;
@@ -54,7 +51,7 @@ public class AuthController {
     @PostMapping("/applelogin")
     public ResponseEntity<SuccessResponse<?>> appleLogin(@RequestBody AppleIdReq appleIdReq){
         log.info("애플로그인 API호출 성공");
-        SignInUserRes tokens = authService.appleLogin(appleIdReq);
+        AppleLoginRes tokens = authService.appleLogin(appleIdReq);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.ok(tokens));

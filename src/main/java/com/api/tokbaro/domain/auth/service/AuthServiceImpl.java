@@ -1,9 +1,6 @@
 package com.api.tokbaro.domain.auth.service;
 
-import com.api.tokbaro.domain.auth.web.dto.AppleIdReq;
-import com.api.tokbaro.domain.auth.web.dto.ReissueReq;
-import com.api.tokbaro.domain.auth.web.dto.SignInUserReq;
-import com.api.tokbaro.domain.auth.web.dto.SignInUserRes;
+import com.api.tokbaro.domain.auth.web.dto.*;
 import com.api.tokbaro.domain.user.entity.Role;
 import com.api.tokbaro.domain.user.entity.User;
 import com.api.tokbaro.domain.user.repository.UserRepository;
@@ -59,7 +56,7 @@ public class AuthServiceImpl implements AuthService {
     //애플계정으로 로그인
     @Override
     @Transactional
-    public SignInUserRes appleLogin(AppleIdReq appleIdReq) {
+    public AppleLoginRes appleLogin(AppleIdReq appleIdReq) {
         //Apple identityToken 검증
         log.info("애플로그인 서비스로직 접근성공");
         JWTClaimsSet claims;
@@ -72,7 +69,8 @@ public class AuthServiceImpl implements AuthService {
 
         //claims에서 appleId와 email 추출
         String appleId = claims.getSubject();
-        String email = appleIdReq.getEmail();
+        //String email = appleIdReq.getEmail();
+        String email = (String)claims.getClaim("email");
 
         //appleId로 사용자 조회
         Optional<User> appleUser = userRepository.findByAppleId(appleId);
@@ -106,7 +104,12 @@ public class AuthServiceImpl implements AuthService {
         SignInUserRes tokens = jwtTokenProvider.createTokens(authentication);
         user.setRefreshToken(tokens.refreshToken());
         userRepository.save(user);
-        return tokens;
+        return AppleLoginRes.builder()
+                .grantType(tokens.grantType())
+                .accessToken(tokens.accessToken())
+                .refreshToken(tokens.refreshToken())
+                .fullName(user.getUsername())
+                .build();
     }
 
     //refreshToken으로 AccessToken갱신
