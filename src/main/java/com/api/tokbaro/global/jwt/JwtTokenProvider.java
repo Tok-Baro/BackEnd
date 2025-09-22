@@ -1,6 +1,6 @@
 package com.api.tokbaro.global.jwt;
 
-import com.api.tokbaro.domain.user.web.dto.SignInUserRes;
+import com.api.tokbaro.domain.auth.web.dto.SignInUserRes;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
