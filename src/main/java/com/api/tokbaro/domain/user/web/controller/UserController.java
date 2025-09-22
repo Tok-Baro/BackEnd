@@ -32,4 +32,12 @@ public class UserController {
                 .status(HttpStatus.CREATED)
                 .body(SuccessResponse.success("회원가입에 성공하였습니다."));
     }
+
+    @GetMapping("/users/me")
+    public ResponseEntity<SuccessResponse<?>> getMyInfo(@AuthenticationPrincipal UserPrincipal userPrincipal){
+        MyInfoRes myInfoRes = userService.getMyInfo(userPrincipal.getId());
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(SuccessResponse.ok(myInfoRes));
+    }
 }
