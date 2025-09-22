@@ -65,6 +65,7 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public User signUpWithApple(String appleId, String email, String username) {
+        log.info("애플계정회원가입 접근 성공");
         if(userRepository.existsByEmail(email)){
             throw new CustomException(UserErrorResponseCode.DUPLICATE_EMAIL_409);
         }

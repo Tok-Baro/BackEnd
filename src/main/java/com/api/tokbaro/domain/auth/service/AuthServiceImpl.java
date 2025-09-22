@@ -61,6 +61,7 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     public SignInUserRes appleLogin(AppleIdReq appleIdReq) {
         //Apple identityToken 검증
+        log.info("애플로그인 서비스로직 접근성공");
         JWTClaimsSet claims;
         try{
             claims = appleJwtVerifier.verify(appleIdReq.getIdentityToken());
