@@ -91,4 +91,13 @@ public class UserServiceImpl implements UserService {
         return apnsService.sendPostureAlert(stateReq);
     }
 
+    @Override
+    public MyInfoRes getMyInfo(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()->new CustomException(UserErrorResponseCode.USER_NOT_FOUND_404));
+        return new MyInfoRes(
+                user.getEmail(),
+                user.getUsername()
+        );
+    }
 }

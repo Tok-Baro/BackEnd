@@ -12,4 +12,6 @@ public interface UserService {
 
     //APNsServierImpl에는 알람전송기능이라는 단일책임을 부여하기 위함.
     ApnsRes handlePostureAlert(Long userId, StateReq stateReq);
+
+    MyInfoRes getMyInfo(Long userId);
 }
