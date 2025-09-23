@@ -3,6 +3,7 @@ package com.api.tokbaro.domain.content.entity;
 import com.api.tokbaro.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @Getter
@@ -10,6 +11,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Slf4j
 public class ContentData {
 
     @Id
@@ -47,6 +49,7 @@ public class ContentData {
         if(this.alertCount==null){
             this.alertCount=0;
         }
+        log.info("경고 횟수 증가");
         this.alertCount++;
     }
 }

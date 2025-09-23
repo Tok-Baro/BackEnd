@@ -173,7 +173,7 @@ public class ApnsServiceImpl implements ApnsService {
                     apnsClient.sendNotification(notification).get();
 
             if (response.isAccepted()) {
-                log.info("Push notification sent successfully to token: {}", token);
+                //log.info("Push notification sent successfully to token: {}", token);
                 result =  new ApnsRes(200, "성공");
             } else {
                 log.error("Push notification failed for token: {}. Reason: {}", token, response.getRejectionReason());
