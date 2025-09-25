@@ -39,7 +39,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             logger.debug("Security Context에 '{}' 인증 정보를 저장했습니다. url: {}", authentication.getName(), request.getRequestURI());
 
-            // Add logging to check the authentication object and principal
+            // 오류체크 로그
             if (authentication != null) {
                 logger.debug("Authentication object: {}", authentication);
                 if (authentication.getPrincipal() instanceof UserPrincipal) {
