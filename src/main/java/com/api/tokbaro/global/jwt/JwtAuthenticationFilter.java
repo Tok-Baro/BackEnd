@@ -25,13 +25,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-        throws IOException, ServletException {
+            throws IOException, ServletException {
 
         //요청 헤더에서 JWT 토큰 추출
         String jwt = resolveToken(request);
 
         //토큰 유효성 검사
-        if(StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
+        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
             //토큰이 유효하면 Authentication 객체를 받아온다.
             Authentication authentication = jwtTokenProvider.getAuthentication(jwt);
 
@@ -39,6 +39,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             logger.debug("Security Context에 '{}' 인증 정보를 저장했습니다. url: {}", authentication.getName(), request.getRequestURI());
 
+            // Add logging to check the authentication object and principal
+            if (authentication != null) {
+                logger.debug("Authentication object: {}", authentication);
+                if (authentication.getPrincipal() instanceof UserPrincipal) {
+                    UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+                    logger.debug("UserPrincipal ID: {}", userPrincipal.getId());
+                } else {
+                    logger.debug("Principal이 UserPrincipal의 인스턴스가 아닙니다. {}", authentication.getPrincipal());
+                }
+            }
         } else {
             logger.debug("유효한 JWT 토큰이 없습니다. url: {}", request.getRequestURI());
         }
@@ -47,7 +57,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
             return bearerToken.substring(BEARER_PREFIX.length());
         }
         return null;
