@@ -4,6 +4,8 @@ import com.api.tokbaro.domain.apns.service.ApnsService;
 import com.api.tokbaro.domain.apns.web.dto.ApnsReq;
 import com.api.tokbaro.domain.apns.web.dto.ApnsRes;
 import com.api.tokbaro.domain.apns.web.dto.StateReq;
+import com.api.tokbaro.domain.content.service.ContentDataService;
+import com.api.tokbaro.domain.content.service.ContentDataServiceImpl;
 import com.api.tokbaro.domain.user.service.UserService;
 import com.api.tokbaro.global.jwt.UserPrincipal;
 import com.api.tokbaro.global.response.SuccessResponse;
@@ -22,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ApnsController {
 
     private final ApnsService apnsService;
-    private final UserService userService;
+    private final ContentDataService contentDataService;
 
     @PostMapping("/register")
     public ResponseEntity<SuccessResponse<?>> register(@RequestBody ApnsReq apnsReq) {
@@ -53,7 +55,7 @@ public class ApnsController {
             @RequestBody StateReq stateReq,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
         //ApnsRes apnsRes = apnsService.sendPostureAlert(stateReq);
-        ApnsRes apnsRes = userService.handlePostureAlert(userPrincipal.getId(), stateReq);
+        ApnsRes apnsRes = contentDataService.handlePostureAlert(userPrincipal.getId(), stateReq);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.ok(apnsRes));
