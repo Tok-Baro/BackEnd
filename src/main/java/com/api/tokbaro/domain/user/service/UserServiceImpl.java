@@ -10,27 +10,13 @@ import com.api.tokbaro.domain.user.entity.User;
 import com.api.tokbaro.domain.user.repository.UserRepository;
 import com.api.tokbaro.domain.user.web.dto.*;
 import com.api.tokbaro.global.exception.CustomException;
-import com.api.tokbaro.global.jwt.AppleJwtVerifier;
-import com.api.tokbaro.global.jwt.JwtTokenProvider;
-import com.api.tokbaro.global.jwt.UserPrincipal;
 import com.api.tokbaro.global.response.code.user.UserErrorResponseCode;
-import com.nimbusds.jose.proc.BadJOSEException;
-import com.nimbusds.jwt.JWTClaimsSet;
-import com.nimbusds.jwt.proc.BadJWTException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.ParseException;
-import java.util.Collections;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -78,18 +64,6 @@ public class UserServiceImpl implements UserService {
                 .build();
 
         return userRepository.save(user);
-    }
-
-    @Override
-    @Transactional
-    public ApnsRes handlePostureAlert(Long userId,  StateReq stateReq) {
-        ContentData contentData = contentDataRepository.findByUserId(userId)
-                .orElseThrow(()->new CustomException(UserErrorResponseCode.CONTENT_DATA_NOT_FOUND_404));
-
-        //contentData.setAlertCount(contentData.getAlertCount() + 1);
-        contentData.increaseAlertCount();
-
-        return apnsService.sendPostureAlert(stateReq);
     }
 
     @Override
