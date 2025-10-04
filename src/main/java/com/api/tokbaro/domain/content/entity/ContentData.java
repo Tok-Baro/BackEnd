@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -51,5 +50,14 @@ public class ContentData {
         }
         log.info("경고 횟수 증가");
         this.alertCount++;
+    }
+
+    //서비스단에서 작성하지 않고 여기서 작성한 이유
+    //기존의 코드는 엔티티에 setter 어노테이션으로 외부에서 값 수정을 하게 했으므로 캡슐화가 깨지게 될 수 있다.
+    //서비스단에서 해당 메소드를 호출해서 값을 바꾸게 함으로써 캡슐화를 지켜낸다.
+    public void updateReactionVelocity(double newReactionVelocity) {
+        if(this.userReactionVelocity==null || newReactionVelocity<this.userReactionVelocity){
+            this.userReactionVelocity = newReactionVelocity;
+        }
     }
 }
