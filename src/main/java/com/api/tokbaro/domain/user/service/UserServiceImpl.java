@@ -75,4 +75,15 @@ public class UserServiceImpl implements UserService {
                 user.getUsername()
         );
     }
+
+    @Override
+    @Transactional
+    public void deleteUser(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(UserErrorResponseCode.USER_NOT_FOUND_404));
+
+        userRepository.delete(user);
+    }
 }
+
+

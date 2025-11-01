@@ -11,4 +11,6 @@ public interface UserService {
     User signUpWithApple(String appleId, String email, String username);
 
     MyInfoRes getMyInfo(Long userId);
+
+    void deleteUser(Long userId);
 }
