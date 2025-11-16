@@ -1,6 +1,7 @@
 package com.api.tokbaro.global.config;
 
 import com.api.tokbaro.global.jwt.JwtAuthenticationFilter;
+import com.api.tokbaro.global.jwt.JwtExtractor;
 import com.api.tokbaro.global.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -22,6 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtExtractor jwtExtractor;
 
     //비밀번호 암호화
     @Bean
@@ -57,7 +59,7 @@ public class SecurityConfig {
                 )
 
                 //JwtAuthenticationFilter를 필터체인에 추가
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, jwtExtractor), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }
