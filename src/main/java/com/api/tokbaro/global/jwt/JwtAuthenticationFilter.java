@@ -22,13 +22,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtExtractor jwtExtractor;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws IOException, ServletException {
 
         //요청 헤더에서 JWT 토큰 추출
-        String jwt = resolveToken(request);
+        String jwt = jwtExtractor.extractAccessToken(request);
 
         //토큰 유효성 검사
         if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
@@ -53,13 +54,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             logger.debug("유효한 JWT 토큰이 없습니다. url: {}", request.getRequestURI());
         }
         filterChain.doFilter(request, response);
-    }
-
-    private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-            return bearerToken.substring(BEARER_PREFIX.length());
-        }
-        return null;
     }
 }
