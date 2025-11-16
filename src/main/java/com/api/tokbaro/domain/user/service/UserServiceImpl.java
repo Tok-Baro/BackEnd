@@ -10,6 +10,8 @@ import com.api.tokbaro.domain.user.entity.User;
 import com.api.tokbaro.domain.user.repository.UserRepository;
 import com.api.tokbaro.domain.user.web.dto.*;
 import com.api.tokbaro.global.exception.CustomException;
+import com.api.tokbaro.global.jwt.JwtTokenProvider;
+import com.api.tokbaro.global.redis.RedisService;
 import com.api.tokbaro.global.response.code.user.UserErrorResponseCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +29,8 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final ContentDataRepository contentDataRepository;
     private final ApnsService apnsService;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final RedisService redisService;
 
     @Override
     @Transactional
@@ -78,9 +82,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deleteUser(Long userId) {
+    public void deleteUser(Long userId, String accessToken) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorResponseCode.USER_NOT_FOUND_404));
+
+        Long expiration = jwtTokenProvider.getExpiration(accessToken);
+        redisService.addTokenToBlacklist(accessToken, expiration);
 
         userRepository.delete(user);
     }
