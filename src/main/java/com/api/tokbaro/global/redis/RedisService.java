@@ -21,4 +21,16 @@ public class RedisService {
     public boolean isTokenBlacklisted(String token){
         return Boolean.TRUE.equals(redisTemplate.hasKey(token));
     }
+
+    public void setValue(final String key, final String value, final Duration duration){
+        redisTemplate.opsForValue().set(key, value, duration);
+    }
+
+    public String getValue(final String key){
+        return (String) redisTemplate.opsForValue().get(key);
+    }
+
+    public void deleteValue(final String key){
+        redisTemplate.delete(key);
+    }
 }
