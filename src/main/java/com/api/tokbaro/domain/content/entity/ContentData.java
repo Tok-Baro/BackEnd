@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
