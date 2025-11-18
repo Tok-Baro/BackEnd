@@ -71,11 +71,13 @@ public class JwtTokenProvider implements InitializingBean {
     }
 
     private String createRefreshToken(Authentication authentication) {
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         long now = (new Date()).getTime();
         Date validity = new Date(now + this.refreshTokenValidity);
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
+                .claim("id", userPrincipal.getId())
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(validity)
                 .compact();
@@ -119,6 +121,7 @@ public class JwtTokenProvider implements InitializingBean {
         return false;
     }
 
+    //토큰의 만료시간을 계산하는 메서드
     public Long getExpiration(String token){
         Date expiration = Jwts.parserBuilder()
                 .setSigningKey(key)
@@ -128,5 +131,20 @@ public class JwtTokenProvider implements InitializingBean {
                 .getExpiration();
         long now = (new Date()).getTime();
         return expiration.getTime() - now;
+    }
+
+    //토큰에서 ID를 추출하는 메서드
+    public Long getUserIdFromToken(String token){
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("id",Long.class);
+    }
+
+    //Redis TTL 설정을 위한 getter 메서드
+    public Long getRefreshTokenValidity(){
+        return refreshTokenValidity;
     }
 }
