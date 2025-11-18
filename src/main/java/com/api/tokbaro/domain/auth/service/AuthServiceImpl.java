@@ -9,6 +9,7 @@ import com.api.tokbaro.global.exception.CustomException;
 import com.api.tokbaro.global.jwt.AppleJwtVerifier;
 import com.api.tokbaro.global.jwt.JwtTokenProvider;
 import com.api.tokbaro.global.jwt.UserPrincipal;
+import com.api.tokbaro.global.redis.RedisService;
 import com.api.tokbaro.global.response.code.user.UserErrorResponseCode;
 import com.nimbusds.jose.proc.BadJOSEException;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -34,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final AppleJwtVerifier appleJwtVerifier;
     private final UserService userService;
+    private final RedisService redisService;
 
     //일반 로그인
     @Override
@@ -149,11 +151,18 @@ public class AuthServiceImpl implements AuthService {
     //로그아웃
     @Override
     @Transactional
-    public void logout(Long userId) {
+    public void logout(Long userId, String accessToken) {
         User user = userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(UserErrorResponseCode.USER_NOT_FOUND_404));
 
+        log.info("로그아웃 요청 사용자: {}", user.getUsername());
+
         user.setRefreshToken(null);
         userRepository.save(user);
+        log.info("DB에서 사용자 {}의 Refresh Token을 제거 하였습니다.", user.getUsername());
+
+        Long expiration = jwtTokenProvider.getExpiration(accessToken);
+        redisService.addTokenToBlacklist(accessToken, expiration);
+        log.info("AccessToken을 블랙리스트에 추가했습니다. 만료 시간 : {}초", expiration);
     }
 }
