@@ -47,10 +47,18 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Attendance> attendanceList;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ContentData contentData;
+
 
     //연관관계 편의 메서드
     public void addAttendance(Attendance attendance) {
         this.attendanceList.add(attendance);
         attendance.setUser(this);
+    }
+
+    public void setContentData(ContentData contentData) {
+        this.contentData = contentData;
+        contentData.setUser(this);
     }
 }
