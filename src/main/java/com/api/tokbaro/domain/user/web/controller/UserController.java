@@ -2,6 +2,7 @@ package com.api.tokbaro.domain.user.web.controller;
 
 import com.api.tokbaro.domain.user.service.UserService;
 import com.api.tokbaro.domain.user.web.dto.*;
+import com.api.tokbaro.global.jwt.JwtExtractor;
 import com.api.tokbaro.global.jwt.JwtTokenProvider;
 import com.api.tokbaro.global.jwt.UserPrincipal;
 import com.api.tokbaro.global.response.SuccessResponse;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
+    private final JwtExtractor jwtExtractor;
 
     //회원가입
     @PostMapping("/users")
@@ -46,11 +48,11 @@ public class UserController {
     //회원탈퇴
     @DeleteMapping("/users")
     public ResponseEntity<SuccessResponse<?>> deleteUser(@AuthenticationPrincipal UserPrincipal userPrincipal,
-                                                         HttpServletRequest request){
-        String accessToken = request.getHeader("Authorization").substring(7);
+                                                         @RequestHeader("Authorization")String authorizationHeader){
+        String accessToken = authorizationHeader.substring(JwtExtractor.BEARER_PREFIX.length());
         userService.deleteUser(userPrincipal.getId(), accessToken);
         return ResponseEntity
                 .status(HttpStatus.OK)
-                .body(SuccessResponse.success("회원탈퇴에 성공하였습니다"));
+                .body(SuccessResponse.okCustom(null,"회원탈퇴에 성공하였습니다"));
     }
 }
