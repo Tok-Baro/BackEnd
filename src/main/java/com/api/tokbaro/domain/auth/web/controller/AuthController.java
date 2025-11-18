@@ -3,6 +3,7 @@ package com.api.tokbaro.domain.auth.web.controller;
 import com.api.tokbaro.domain.auth.service.AuthService;
 import com.api.tokbaro.domain.auth.web.dto.*;
 import com.api.tokbaro.domain.user.service.UserService;
+import com.api.tokbaro.global.jwt.JwtExtractor;
 import com.api.tokbaro.global.jwt.UserPrincipal;
 import com.api.tokbaro.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
@@ -10,10 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,8 +32,10 @@ public class AuthController {
 
     //로그아웃
     @PostMapping("/logout")
-    public ResponseEntity<SuccessResponse<?>> logout(@AuthenticationPrincipal UserPrincipal userPrincipal) {
-        authService.logout(userPrincipal.getId());
+    public ResponseEntity<SuccessResponse<?>> logout(@AuthenticationPrincipal UserPrincipal userPrincipal,
+                                                     @RequestHeader("Authorization")String authorizationHeader) {
+        String accessToken = authorizationHeader.substring(JwtExtractor.BEARER_PREFIX.length());
+        authService.logout(userPrincipal.getId(),accessToken);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.emptyCustom("로그아웃에 성공하였습니다."));
