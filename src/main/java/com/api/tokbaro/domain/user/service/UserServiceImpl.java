@@ -86,10 +86,13 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorResponseCode.USER_NOT_FOUND_404));
 
+        log.info("회원 탈퇴 요청 사용자 : {}", user.getUsername());
         Long expiration = jwtTokenProvider.getExpiration(accessToken);
         redisService.addTokenToBlacklist(accessToken, expiration);
+        log.info("액세스 토큰이 블랙리스트에 추가 되었습니다. (만료시간 : {}초)", expiration);
 
         userRepository.delete(user);
+        log.info("유저 데이터가 성공적으로 삭제되었습니다.");
     }
 }
 
