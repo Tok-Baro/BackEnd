@@ -89,6 +89,7 @@ public class UserServiceImpl implements UserService {
         log.info("회원 탈퇴 요청 사용자 : {}", user.getUsername());
         Long expiration = jwtTokenProvider.getExpiration(accessToken);
         redisService.addTokenToBlacklist(accessToken, expiration);
+        redisService.deleteValue("RT:" + user.getId());
         log.info("액세스 토큰이 블랙리스트에 추가 되었습니다. (만료시간 : {}초)", expiration);
 
         userRepository.delete(user);
