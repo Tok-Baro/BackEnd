@@ -1,0 +1,25 @@
+cat << EOF > .dockerignore
+# Git 관련 파일 제외
+.git
+.gitignore
+.github
+
+# Gradle 관련 파일 제외
+.gradle
+build/
+gradle/
+gradlew
+gradlew.bat
+
+# IDE 설정 파일 제외
+.idea
+
+# Nginx 설정 및 인증서 파일 제외 (이번 오류의 핵심)
+nginx/
+
+# Node.js 관련 파일 (만약 사용한다면)
+node_modules/
+
+# 생성된 로그 파일 제외
+*.log
+EOF
