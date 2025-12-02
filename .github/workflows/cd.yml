@@ -27,19 +27,19 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           script: |
-            # 1. 서버에 미리 클론해둔 프로젝트 디렉토리로 이동합니다.
+            # 1. 서버에 있는 프로젝트 디렉토리로 이동합니다.
             cd /home/${{ secrets.SERVER_USER }}/BackEnd
 
-            # 2. 최신 소스 코드를 pull 받습니다.
-            echo "Pulling latest source code..."
+            # 2. docker-compose.yml 같은 설정 파일 변경을 반영하기 위해 git pull을 실행합니다.
+            echo "Pulling latest configuration files..."
             git pull origin main
 
             # 3. GitHub Secret으로부터 .env 파일을 생성합니다.
             echo "Creating .env file..."
             echo "${{ secrets.ENV_FILE }}" > .env
 
-            # 4. docker-compose.yml에 정의된 최신 이미지들을 pull 받습니다.
-            echo "Pulling latest docker images from registry..."
+            # 4. ci.yml에서 빌드한 최신 Docker 이미지를 pull 받습니다.
+            echo "Pulling latest docker image from registry..."
             docker-compose pull
 
             # 5. 인증서 존재 여부 확인 및 발급/갱신 처리
@@ -48,17 +48,17 @@ jobs:
             if [ -d "$CERT_DIR" ]; then
               # --- 인증서가 이미 있는 경우 ---
               echo "Certificate found. Starting services and renewing..."
-              docker-compose up -d --build
+              # --build 플래그를 제거하여, 서버에서 재빌드하는 대신 pull 받은 이미지를 사용하도록 합니다.
+              docker-compose up -d
               docker-compose exec certbot renew --quiet
             else
               # --- 인증서가 없는 경우 (최초 배포) ---
               echo "Certificate not found. Issuing a new one..."
-              # Certbot 단독 모드로 인증서 발급 (80번 포트를 직접 사용)
               docker-compose run --rm certbot certonly --standalone \
                 --email ${{ env.EMAIL }} -d ${{ env.DOMAIN }} \
                 --rsa-key-size 4096 --agree-tos --non-interactive
-              # 모든 서비스를 시작
-              docker-compose up -d --build
+              # --build 플래그를 제거하여, 서버에서 재빌드하는 대신 pull 받은 이미지를 사용하도록 합니다.
+              docker-compose up -d
             fi
 
             # 6. 불필요한 Docker 이미지를 정리합니다.
