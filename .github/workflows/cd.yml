@@ -12,7 +12,7 @@ permissions:
 env:
   IMAGE: ${{ secrets.DOCKER_USERNAME }}/tokbaro
   DOMAIN: tokbaro.com
-  EMAIL: tokbaro.conncet@gmail.com
+  EMAIL: tokbaro.connect@gmail.com
 
 jobs:
   deploy:
@@ -28,7 +28,7 @@ jobs:
           port: 22
           script: |
             # 1. 서버에 미리 클론해둔 프로젝트 디렉토리로 이동합니다.
-            cd /home/${{ secrets.SERVER_USER }}/tokbaro
+            cd /home/${{ secrets.SERVER_USER }}/BackEnd
 
             # 2. 최신 소스 코드를 pull 받습니다.
             echo "Pulling latest source code..."
@@ -43,7 +43,7 @@ jobs:
             docker-compose pull
 
             # 5. 인증서 존재 여부 확인 및 발급/갱신 처리
-            CERT_DIR="/home/${{ secrets.SERVER_USER }}/tokbaro/nginx/letsencrypt/live/${{ env.DOMAIN }}"
+            CERT_DIR="/home/${{ secrets.SERVER_USER }}/BackEnd/nginx/letsencrypt/live/${{ env.DOMAIN }}"
 
             if [ -d "$CERT_DIR" ]; then
               # --- 인증서가 이미 있는 경우 ---
