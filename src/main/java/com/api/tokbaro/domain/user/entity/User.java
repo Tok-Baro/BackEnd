@@ -37,8 +37,6 @@ public class User extends BaseEntity {
     @Column(name = "apple_id")
     private String appleId; //애플 로그인 사용자 고유 ID
 
-    @Column(name = "refresh_token") //JWT 리프레쉬 토큰
-    private String refreshToken;
 
     @Enumerated(EnumType.STRING) //Enum값을 문자열로 저장
     private Role role;
@@ -47,10 +45,18 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Attendance> attendanceList;
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ContentData contentData;
+
 
     //연관관계 편의 메서드
     public void addAttendance(Attendance attendance) {
         this.attendanceList.add(attendance);
         attendance.setUser(this);
+    }
+
+    public void setContentData(ContentData contentData) {
+        this.contentData = contentData;
+        contentData.setUser(this);
     }
 }

@@ -27,6 +27,7 @@ src/main/resources/keys/AuthKey.p8
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+src/main/resources/keys/AuthKey.p8
 
 ### NetBeans ###
 /nbproject/private/
