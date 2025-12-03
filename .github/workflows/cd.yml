@@ -37,6 +37,7 @@ jobs:
             # 3. GitHub Secret으로부터 .env 파일을 생성합니다.
             echo "Creating .env file..."
             echo "${{ secrets.ENV_FILE }}" > .env
+            echo "DOCKER_IMAGE=${{ env.IMAGE }}:${{ github.sha }}" >> .env
 
             # 4. ci.yml에서 빌드한 최신 Docker 이미지를 pull 받습니다.
             echo "Pulling latest docker image from registry..."

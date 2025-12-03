@@ -3,6 +3,7 @@ version: "3.8"
 services:
   springboot-app:
     build: .
+    image: ${DOCKER_IMAGE:-tokbaro-app}
     container_name: tokbaro-app
     depends_on:
       - redis
