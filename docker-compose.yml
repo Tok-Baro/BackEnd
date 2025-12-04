@@ -48,25 +48,10 @@ services:
       - springboot-app
     ports:
       - "80:80"
-      - "443:443" # HTTPS를 위한 443 포트 추가
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      # Let's Encrypt 인증서 공유를 위한 볼륨 추가
-      - ./nginx/letsencrypt:/etc/letsencrypt
-      # Let's Encrypt 도메인 인증용 파일 공유를 위한 볼륨 추가
-      - ./nginx/www:/var/www/certbot
     networks:
       - tokbaro-network
-
-  # Certbot 서비스 추가
-  certbot:
-    image: certbot/certbot
-    container_name: tokbaro-certbot
-    volumes:
-      # Let's Encrypt 인증서 공유
-      - ./nginx/letsencrypt:/etc/letsencrypt
-      # Let's Encrypt 도메인 인증용 파일 공유
-      - ./nginx/www:/var/www/certbot
 
 networks:
   tokbaro-network:
