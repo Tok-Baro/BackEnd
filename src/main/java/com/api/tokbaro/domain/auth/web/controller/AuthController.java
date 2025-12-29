@@ -34,8 +34,8 @@ public class AuthController {
     @PostMapping("/logout")
     public ResponseEntity<SuccessResponse<?>> logout(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                      @RequestHeader("Authorization")String authorizationHeader) {
-        String accessToken = authorizationHeader.substring(JwtExtractor.BEARER_PREFIX.length());
-        authService.logout(userPrincipal.getId(),accessToken);
+
+        authService.logout(userPrincipal.getId(),authorizationHeader);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.emptyCustom("로그아웃에 성공하였습니다."));
