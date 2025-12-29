@@ -6,5 +6,5 @@ public interface AuthService {
     SignInUserRes signIn(SignInUserReq signInUserReq);
     AppleLoginRes appleLogin(AppleIdReq appleIdReq);
     SignInUserRes reissue(ReissueReq reissueReq);
-    void logout(Long userId, String token);
+    void logout(Long userId, String authorizationHeader);
 }
