@@ -1,10 +1,5 @@
 package com.api.tokbaro.domain.user.service;
 
-import com.api.tokbaro.domain.apns.service.ApnsService;
-import com.api.tokbaro.domain.apns.web.dto.ApnsRes;
-import com.api.tokbaro.domain.apns.web.dto.StateReq;
-import com.api.tokbaro.domain.content.entity.ContentData;
-import com.api.tokbaro.domain.content.repository.ContentDataRepository;
 import com.api.tokbaro.domain.user.entity.Role;
 import com.api.tokbaro.domain.user.entity.User;
 import com.api.tokbaro.domain.user.repository.UserRepository;
@@ -28,8 +23,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final ContentDataRepository contentDataRepository;
-    private final ApnsService apnsService;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
 

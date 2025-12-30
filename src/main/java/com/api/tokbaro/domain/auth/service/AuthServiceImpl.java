@@ -1,14 +1,12 @@
 package com.api.tokbaro.domain.auth.service;
 
 import com.api.tokbaro.domain.auth.web.dto.*;
-import com.api.tokbaro.domain.user.entity.Role;
 import com.api.tokbaro.domain.user.entity.User;
 import com.api.tokbaro.domain.user.repository.UserRepository;
 import com.api.tokbaro.domain.user.service.UserService;
 import com.api.tokbaro.global.constant.StaticValue;
 import com.api.tokbaro.global.exception.CustomException;
 import com.api.tokbaro.global.jwt.AppleJwtVerifier;
-import com.api.tokbaro.global.jwt.JwtExtractor;
 import com.api.tokbaro.global.jwt.JwtTokenProvider;
 import com.api.tokbaro.global.jwt.UserPrincipal;
 import com.api.tokbaro.global.redis.RedisService;
