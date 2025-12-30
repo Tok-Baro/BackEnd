@@ -9,6 +9,7 @@ import com.api.tokbaro.domain.user.entity.Role;
 import com.api.tokbaro.domain.user.entity.User;
 import com.api.tokbaro.domain.user.repository.UserRepository;
 import com.api.tokbaro.domain.user.web.dto.*;
+import com.api.tokbaro.global.constant.StaticValue;
 import com.api.tokbaro.global.exception.CustomException;
 import com.api.tokbaro.global.jwt.JwtTokenProvider;
 import com.api.tokbaro.global.redis.RedisService;
@@ -82,14 +83,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void deleteUser(Long userId, String accessToken) {
+    public void deleteUser(Long userId, String authorizationHeader) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorResponseCode.USER_NOT_FOUND_404));
 
         log.info("회원 탈퇴 요청 사용자 : {}", user.getUsername());
+
+        String accessToken = authorizationHeader.substring(StaticValue.BEARER_PREFIX.length());
+
         Long expiration = jwtTokenProvider.getExpiration(accessToken);
         redisService.addTokenToBlacklist(accessToken, expiration);
-        redisService.deleteValue("RT:" + user.getId());
+        redisService.deleteValue(StaticValue.REFRESH_TOKEN_KEY_PREFIX + user.getId());
         log.info("액세스 토큰이 블랙리스트에 추가 되었습니다. (만료시간 : {}초)", expiration);
 
         userRepository.delete(user);
