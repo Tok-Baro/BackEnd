@@ -2,6 +2,7 @@ package com.api.tokbaro.domain.user.web.controller;
 
 import com.api.tokbaro.domain.user.service.UserService;
 import com.api.tokbaro.domain.user.web.dto.*;
+import com.api.tokbaro.global.constant.StaticValue;
 import com.api.tokbaro.global.jwt.JwtExtractor;
 import com.api.tokbaro.global.jwt.JwtTokenProvider;
 import com.api.tokbaro.global.jwt.UserPrincipal;
@@ -49,8 +50,7 @@ public class UserController {
     @DeleteMapping("/users")
     public ResponseEntity<SuccessResponse<?>> deleteUser(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                          @RequestHeader("Authorization")String authorizationHeader){
-        String accessToken = authorizationHeader.substring(JwtExtractor.BEARER_PREFIX.length());
-        userService.deleteUser(userPrincipal.getId(), accessToken);
+        userService.deleteUser(userPrincipal.getId(), authorizationHeader);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.okCustom(null,"회원탈퇴에 성공하였습니다"));
