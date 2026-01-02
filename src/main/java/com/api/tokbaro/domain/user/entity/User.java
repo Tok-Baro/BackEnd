@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -63,12 +64,16 @@ public class User extends BaseEntity {
     @Column(name = "withdrawn_at")
     private LocalDateTime withdrawnAt;
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Attendance> attendanceList;
+    private List<Attendance> attendanceList =  new ArrayList<>();
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private ContentData contentData;
 
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserConsent> consents = new ArrayList<>();
 
     //연관관계 편의 메서드
     public void addAttendance(Attendance attendance) {
