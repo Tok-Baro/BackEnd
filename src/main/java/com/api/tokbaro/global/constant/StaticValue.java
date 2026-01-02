@@ -13,4 +13,10 @@ public class StaticValue { // 공통 응답 enum 정의 클래스
     public static final int METHOD_NOT_ALLOWED = 405;       // 허용되지 않는 메서드
     public static final int CONFLICT = 409;                 // 충돌 발생
     public static final int INTERNAL_SERVER_ERROR = 500;    // 서버 내부 오류
+
+    //JWT and Security Constants
+    public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String BEARER_PREFIX = "Bearer ";
+    public static final String ID_CLAIM_KEY = "id";
+    public static final String REFRESH_TOKEN_KEY_PREFIX = "RT:";
 }

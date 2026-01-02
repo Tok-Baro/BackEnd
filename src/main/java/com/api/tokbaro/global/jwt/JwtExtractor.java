@@ -1,5 +1,6 @@
 package com.api.tokbaro.global.jwt;
 
+import com.api.tokbaro.global.constant.StaticValue;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -7,13 +8,10 @@ import org.springframework.util.StringUtils;
 @Component
 public class JwtExtractor {
 
-    public static final String AUTHORIZATION_HEADER = "Authorization";
-    public static final String BEARER_PREFIX = "Bearer ";
-
     public String extractAccessToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-            return bearerToken.substring(BEARER_PREFIX.length());
+        String bearerToken = request.getHeader(StaticValue.AUTHORIZATION_HEADER);
+        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(StaticValue.BEARER_PREFIX)) {
+            return bearerToken.substring(StaticValue.BEARER_PREFIX.length());
         }
         return null;
     }

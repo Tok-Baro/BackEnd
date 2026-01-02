@@ -1,10 +1,10 @@
 package com.api.tokbaro.domain.auth.service;
 
 import com.api.tokbaro.domain.auth.web.dto.*;
-import com.api.tokbaro.domain.user.entity.Role;
 import com.api.tokbaro.domain.user.entity.User;
 import com.api.tokbaro.domain.user.repository.UserRepository;
 import com.api.tokbaro.domain.user.service.UserService;
+import com.api.tokbaro.global.constant.StaticValue;
 import com.api.tokbaro.global.exception.CustomException;
 import com.api.tokbaro.global.jwt.AppleJwtVerifier;
 import com.api.tokbaro.global.jwt.JwtTokenProvider;
@@ -37,7 +37,6 @@ public class AuthServiceImpl implements AuthService {
     private final AppleJwtVerifier appleJwtVerifier;
     private final UserService userService;
     private final RedisService redisService;
-    private static final String REFRESH_TOKEN_KEY_PREFIX = "RT:";
 
     //일반 로그인
     @Override
@@ -53,7 +52,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findById(userPrincipal.getId())
                 .orElseThrow(()->new CustomException(UserErrorResponseCode.USER_NOT_FOUND_404));
 
-        redisService.setValue(REFRESH_TOKEN_KEY_PREFIX + user.getId(), tokens.refreshToken(), Duration.ofMillis(jwtTokenProvider.getRefreshTokenValidity()));
+        redisService.setValue(StaticValue.REFRESH_TOKEN_KEY_PREFIX + user.getId(), tokens.refreshToken(), Duration.ofMillis(jwtTokenProvider.getRefreshTokenValidity()));
         return tokens;
     }
 
@@ -106,7 +105,7 @@ public class AuthServiceImpl implements AuthService {
 
         //accessToken, refresh토큰 생성
         SignInUserRes tokens = jwtTokenProvider.createTokens(authentication);
-        redisService.setValue(REFRESH_TOKEN_KEY_PREFIX + user.getId(), tokens.refreshToken(),
+        redisService.setValue(StaticValue.REFRESH_TOKEN_KEY_PREFIX + user.getId(), tokens.refreshToken(),
                 Duration.ofMillis(jwtTokenProvider.getRefreshTokenValidity()));
         return AppleLoginRes.builder()
                 .grantType(tokens.grantType())
@@ -127,7 +126,7 @@ public class AuthServiceImpl implements AuthService {
 
         //2. RefreshToken으로 사용자 ID 추출 및 Redis에서 검증
         Long userId = jwtTokenProvider.getUserIdFromToken(reissueReq.getRefreshToken());
-        String storedRefreshToken = redisService.getValue(REFRESH_TOKEN_KEY_PREFIX + userId);
+        String storedRefreshToken = redisService.getValue(StaticValue.REFRESH_TOKEN_KEY_PREFIX + userId);
 
         if(storedRefreshToken == null || !storedRefreshToken.equals(reissueReq.getRefreshToken())){
             throw new CustomException(UserErrorResponseCode.INVALID_REFRESH_TOKEN_401);
@@ -144,7 +143,7 @@ public class AuthServiceImpl implements AuthService {
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
         );
 
-        redisService.deleteValue(REFRESH_TOKEN_KEY_PREFIX + userId);
+        redisService.deleteValue(StaticValue.REFRESH_TOKEN_KEY_PREFIX + userId);
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(
                 userPrincipal,
@@ -153,7 +152,7 @@ public class AuthServiceImpl implements AuthService {
 
         //새로운 토큰 생성
         SignInUserRes newTokens = jwtTokenProvider.createTokens(authentication);
-        redisService.setValue(REFRESH_TOKEN_KEY_PREFIX + user.getId(), newTokens.refreshToken(), Duration.ofMillis(jwtTokenProvider.getRefreshTokenValidity()));
+        redisService.setValue(StaticValue.REFRESH_TOKEN_KEY_PREFIX + user.getId(), newTokens.refreshToken(), Duration.ofMillis(jwtTokenProvider.getRefreshTokenValidity()));
 
         return newTokens;
     }
@@ -161,13 +160,15 @@ public class AuthServiceImpl implements AuthService {
     //로그아웃
     @Override
     @Transactional
-    public void logout(Long userId, String accessToken) {
+    public void logout(Long userId, String authorizationHeader) {
         User user = userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(UserErrorResponseCode.USER_NOT_FOUND_404));
 
         log.info("로그아웃 요청 사용자: {}", user.getUsername());
 
-        redisService.deleteValue(REFRESH_TOKEN_KEY_PREFIX + userId);
+        String accessToken = authorizationHeader.substring(StaticValue.BEARER_PREFIX.length());
+
+        redisService.deleteValue(StaticValue.REFRESH_TOKEN_KEY_PREFIX + userId);
         log.info("Redis에서 사용자 {}의 Refresh Token을 제거 하였습니다.", user.getUsername());
 
         Long expiration = jwtTokenProvider.getExpiration(accessToken);

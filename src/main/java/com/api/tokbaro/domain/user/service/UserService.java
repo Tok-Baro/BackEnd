@@ -12,5 +12,5 @@ public interface UserService {
 
     MyInfoRes getMyInfo(Long userId);
 
-    void deleteUser(Long userId, String accessToken);
+    void deleteUser(Long userId, String authorizationHeader);
 }

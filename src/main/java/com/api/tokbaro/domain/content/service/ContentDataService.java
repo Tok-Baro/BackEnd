@@ -5,7 +5,6 @@ import com.api.tokbaro.domain.apns.web.dto.ApnsRes;
 import com.api.tokbaro.domain.apns.web.dto.StateReq;
 import com.api.tokbaro.domain.content.web.dto.ReactionReq;
 import com.api.tokbaro.domain.content.web.dto.ReactionVelocityRes;
-import com.api.tokbaro.global.jwt.UserPrincipal;
 
 import java.util.List;
 

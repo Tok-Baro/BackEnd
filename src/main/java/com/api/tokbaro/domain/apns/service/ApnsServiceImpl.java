@@ -4,7 +4,6 @@ import com.api.tokbaro.domain.apns.web.dto.ApnsReq;
 import com.api.tokbaro.domain.apns.web.dto.ApnsRes;
 import com.api.tokbaro.domain.apns.web.dto.StateReq;
 import com.eatthepath.pushy.apns.*;
-import com.eatthepath.pushy.apns.util.SimpleApnsPushNotification;
 import com.eatthepath.pushy.apns.util.TokenUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;

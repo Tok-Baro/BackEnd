@@ -3,19 +3,13 @@ package com.api.tokbaro.domain.user.web.controller;
 import com.api.tokbaro.domain.user.service.UserService;
 import com.api.tokbaro.domain.user.web.dto.*;
 import com.api.tokbaro.global.jwt.JwtExtractor;
-import com.api.tokbaro.global.jwt.JwtTokenProvider;
 import com.api.tokbaro.global.jwt.UserPrincipal;
 import com.api.tokbaro.global.response.SuccessResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -25,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     private final UserService userService;
-    private final JwtExtractor jwtExtractor;
 
     //회원가입
     @PostMapping("/users")
@@ -49,8 +42,7 @@ public class UserController {
     @DeleteMapping("/users")
     public ResponseEntity<SuccessResponse<?>> deleteUser(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                          @RequestHeader("Authorization")String authorizationHeader){
-        String accessToken = authorizationHeader.substring(JwtExtractor.BEARER_PREFIX.length());
-        userService.deleteUser(userPrincipal.getId(), accessToken);
+        userService.deleteUser(userPrincipal.getId(), authorizationHeader);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.okCustom(null,"회원탈퇴에 성공하였습니다"));
