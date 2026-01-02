@@ -5,6 +5,7 @@ import com.api.tokbaro.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -14,10 +15,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
-/*
-    기본유저 엔티티
-    나중에 JWT, Spring Security 추가해야함
- */
 public class User extends BaseEntity {
 
     @Id
@@ -25,22 +22,46 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
-    @Column(name = "username")
-    private String username; //회원이름
+    @Column(name = "nickname")
+    private String nickname; //회원닉네임
 
     @Column(name = "password")
     private String password; //회원비밀번호
 
-    @Column(name = "apple_id")
-    private String appleId; //애플 로그인 사용자 고유 ID
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider", nullable = false)
+    private ProviderType provider;
 
+    /*
+        apple, kakao로 가입했을 때 이메일을 비공개할 수도 있기에 사용자를 식별하는 고유의 키 역할을 한다.
+     */
+    @Column(name = "provider_id")
+    private String providerId;
 
-    @Enumerated(EnumType.STRING) //Enum값을 문자열로 저장
+    @Column(name = "profile_image_url")
+    private String profileImageUrl;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private UserStatus status = UserStatus.ACTIVE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
     private Role role;
 
+    @Builder.Default
+    @Column(name = "follower_count", nullable = false)
+    private Integer followerCount = 0;
+
+    @Builder.Default
+    @Column(name = "following_count", nullable = false)
+    private Integer followingCount = 0;
+
+    @Column(name = "withdrawn_at")
+    private LocalDateTime withdrawnAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Attendance> attendanceList;
