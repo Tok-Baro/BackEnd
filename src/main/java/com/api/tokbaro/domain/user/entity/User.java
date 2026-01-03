@@ -11,7 +11,6 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -74,6 +73,13 @@ public class User extends BaseEntity {
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserConsent> consents = new ArrayList<>();
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Userprofile userProfile;
+
+    public void setUserProfile(Userprofile userProfile) {
+        this.userProfile = userProfile;
+    }
 
     //연관관계 편의 메서드
     public void addAttendance(Attendance attendance) {
