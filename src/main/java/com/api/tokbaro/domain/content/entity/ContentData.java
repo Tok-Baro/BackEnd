@@ -7,9 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 
 @Entity
 @Getter
-@Setter
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Slf4j
 public class ContentData {
@@ -43,6 +42,10 @@ public class ContentData {
         if(alertCount==null) {
             alertCount = 0;
         }
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public void increaseAlertCount() {
