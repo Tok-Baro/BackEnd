@@ -16,7 +16,7 @@ import java.util.List;
 public class UserPrincipal implements UserDetails {
 
     private final Long id;
-    private final String username;
+    private final String email;
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
 
@@ -25,7 +25,7 @@ public class UserPrincipal implements UserDetails {
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
         return new UserPrincipal(
                 user.getId(),
-                user.getUsername(),
+                user.getEmail(),
                 user.getPassword(),
                 authorities
         );
@@ -42,8 +42,8 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
-    }
+        return email;
+    } //메소드명은 Username이지만 email기반 인증이기에 email을 리턴함의 유의
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
