@@ -23,7 +23,7 @@ public class User extends BaseEntity {
     private Long id;
 
     @Column(name = "email", unique = true)
-    private String email;
+    private String email; //회원 이메일
 
     @Column(name = "nickname")
     private String nickname; //회원닉네임
@@ -33,16 +33,14 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "provider", nullable = false)
-    private ProviderType provider;
+    private ProviderType provider; //인증방식 APPLE, KAKAO, EMAIL
 
-    /*
-        apple, kakao로 가입했을 때 이메일을 비공개할 수도 있기에 사용자를 식별하는 고유의 키 역할을 한다.
-     */
+    //apple, kakao로 가입했을 때 이메일을 비공개할 수도 있기에 사용자를 식별하는 고유의 키 역할을 한다.
     @Column(name = "provider_id")
     private String providerId;
 
     @Column(name = "profile_image_url")
-    private String profileImageUrl;
+    private String profileImageUrl; //회원프로필이미지
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
@@ -61,24 +59,40 @@ public class User extends BaseEntity {
     private Integer followingCount = 0;
 
     @Column(name = "withdrawn_at")
-    private LocalDateTime withdrawnAt;
+    private LocalDateTime withdrawnAt; //회원탈퇴시간
 
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Attendance> attendanceList =  new ArrayList<>();
+    private List<Attendance> attendanceList =  new ArrayList<>(); //출석테이블과 매핑
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private ContentData contentData;
+    private ContentData contentData; //콘텐츠데이터 테이블과 매핑
 
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserConsent> consents = new ArrayList<>();
+    private List<UserConsent> consents = new ArrayList<>(); //각 동의여부 테이블과 매핑
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Userprofile userProfile;
+    private Userprofile userProfile; //유저프로필정보 테이블과 매핑
 
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private NotificationSettings notificationSettings;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Device> devices = new ArrayList<>();
+
+    //setter
     public void setUserProfile(Userprofile userProfile) {
         this.userProfile = userProfile;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
+
+    public void setWithdrawnAt(LocalDateTime withdrawnAt) {
+        this.withdrawnAt = withdrawnAt;
     }
 
     //연관관계 편의 메서드
@@ -90,5 +104,9 @@ public class User extends BaseEntity {
     public void setContentData(ContentData contentData) {
         this.contentData = contentData;
         contentData.setUser(this);
+    }
+
+    public void setNotificationSettings(NotificationSettings notificationSettings) {
+        this.notificationSettings = notificationSettings;
     }
 }
