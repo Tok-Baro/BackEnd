@@ -1,5 +1,6 @@
 package com.api.tokbaro.domain.user.entity;
 
+import com.api.tokbaro.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "user_profiles")
-public class Userprofile {
+public class Userprofile extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
