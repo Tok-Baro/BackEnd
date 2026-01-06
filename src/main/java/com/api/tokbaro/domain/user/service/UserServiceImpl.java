@@ -1,7 +1,9 @@
 package com.api.tokbaro.domain.user.service;
 
+import com.api.tokbaro.domain.user.entity.ProviderType;
 import com.api.tokbaro.domain.user.entity.Role;
 import com.api.tokbaro.domain.user.entity.User;
+import com.api.tokbaro.domain.user.entity.UserStatus;
 import com.api.tokbaro.domain.user.repository.UserRepository;
 import com.api.tokbaro.domain.user.web.dto.*;
 import com.api.tokbaro.global.constant.StaticValue;
@@ -31,15 +33,18 @@ public class UserServiceImpl implements UserService {
     public void signUp(SignUpUserReq signUpUserReq) {
 
         //유저가 존재하는지 검증
-        if(userRepository.existsByUsername(signUpUserReq.getUsername())){
-            throw new CustomException(UserErrorResponseCode.DUPLICATE_USERNAME_409);
+        if(userRepository.existsByEmail(signUpUserReq.getEmail())){
+            throw new CustomException(UserErrorResponseCode.DUPLICATE_EMAIL_409);
         }
 
         //비밀번호 암호화 및 사용자 생성
         User user = User.builder()
-                .username(signUpUserReq.getUsername())
+                .nickname(signUpUserReq.getNickname())
+                .email(signUpUserReq.getEmail())
                 .password(passwordEncoder.encode(signUpUserReq.getPassword()))
                 .role(Role.USER)
+                .provider(ProviderType.EMAIL)
+                .status(UserStatus.ACTIVE)
                 .build();
 
         //사용자 저장
@@ -56,8 +61,9 @@ public class UserServiceImpl implements UserService {
 
         User user = User.builder()
                 .email(email)
-                .username(username)
-                .appleId(appleId)
+                .nickname(username)
+                .providerId(appleId)
+                .provider(ProviderType.APPLE)
                 .role(Role.USER)
                 .build();
 
@@ -70,7 +76,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(()->new CustomException(UserErrorResponseCode.USER_NOT_FOUND_404));
         return new MyInfoRes(
                 user.getEmail(),
-                user.getUsername()
+                user.getNickname()
         );
     }
 
@@ -80,7 +86,7 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorResponseCode.USER_NOT_FOUND_404));
 
-        log.info("회원 탈퇴 요청 사용자 : {}", user.getUsername());
+        log.info("회원 탈퇴 요청 사용자 : {}", user.getEmail());
 
         String accessToken = authorizationHeader.substring(StaticValue.BEARER_PREFIX.length());
 
