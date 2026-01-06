@@ -42,7 +42,7 @@ public class UserController {
     @DeleteMapping("/users")
     public ResponseEntity<SuccessResponse<?>> deleteUser(@AuthenticationPrincipal UserPrincipal userPrincipal,
                                                          @RequestHeader("Authorization")String authorizationHeader){
-        userService.deleteUser(userPrincipal.getId(), authorizationHeader);
+        userService.withdrawUser(userPrincipal.getId(), authorizationHeader);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(SuccessResponse.okCustom(null,"회원탈퇴에 성공하였습니다"));
