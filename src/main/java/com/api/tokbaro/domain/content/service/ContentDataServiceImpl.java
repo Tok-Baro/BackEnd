@@ -52,7 +52,7 @@ public class ContentDataServiceImpl implements ContentDataService {
                 .getContent()
                 .stream()
                 .map(contentData -> new ReactionVelocityRes(
-                        contentData.getUser().getUsername(),
+                        contentData.getUser().getNickname(),
                         contentData.getUserReactionVelocity()
                 ))
                 .collect(Collectors.toList());
