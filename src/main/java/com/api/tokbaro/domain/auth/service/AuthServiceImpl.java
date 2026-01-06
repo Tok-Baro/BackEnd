@@ -42,7 +42,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public SignInUserRes signIn(SignInUserReq signInUserReq) {
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(signInUserReq.getUsername(), signInUserReq.getPassword());
+                new UsernamePasswordAuthenticationToken(signInUserReq.getEmail(), signInUserReq.getPassword());
 
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
@@ -76,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
         String email = (String)claims.getClaim("email");
 
         //appleId로 사용자 조회
-        Optional<User> appleUser = userRepository.findByAppleId(appleId);
+        Optional<User> appleUser = userRepository.findByProviderId(appleId);
         User user;
 
         if(appleUser.isPresent()){
@@ -84,13 +84,13 @@ public class AuthServiceImpl implements AuthService {
             user = appleUser.get();
         } else {
             //신규 사용자인 경우 (회원가입으로)
-            String username = appleIdReq.getFamilyName() + appleIdReq.getGivenName();
-            user = userService.signUpWithApple(appleId,email,username);
+            String nickname = appleIdReq.getFamilyName() + appleIdReq.getGivenName();
+            user = userService.signUpWithApple(appleId,email,nickname);
         }
 
         UserPrincipal userPrincipal = new UserPrincipal(
                 user.getId(),
-                user.getUsername(),
+                user.getEmail(),
                 null,
                 //iOS도 ROLE_USER로 역할이 인식되게 해주어야한다.
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
@@ -111,7 +111,7 @@ public class AuthServiceImpl implements AuthService {
                 .grantType(tokens.grantType())
                 .accessToken(tokens.accessToken())
                 .refreshToken(tokens.refreshToken())
-                .fullName(user.getUsername())
+                .fullName(user.getNickname())
                 .build();
     }
 
@@ -138,7 +138,7 @@ public class AuthServiceImpl implements AuthService {
         //새로운 토큰을 위한 Authentication 객체 생성
         UserPrincipal userPrincipal = new UserPrincipal(
                 user.getId(),
-                user.getUsername(),
+                user.getEmail(),
                 null,
                 Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()))
         );
@@ -164,12 +164,12 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findById(userId)
                 .orElseThrow(()->new CustomException(UserErrorResponseCode.USER_NOT_FOUND_404));
 
-        log.info("로그아웃 요청 사용자: {}", user.getUsername());
+        log.info("로그아웃 요청 사용자: {}", user.getEmail());
 
         String accessToken = authorizationHeader.substring(StaticValue.BEARER_PREFIX.length());
 
         redisService.deleteValue(StaticValue.REFRESH_TOKEN_KEY_PREFIX + userId);
-        log.info("Redis에서 사용자 {}의 Refresh Token을 제거 하였습니다.", user.getUsername());
+        log.info("Redis에서 사용자 {}의 Refresh Token을 제거 하였습니다.", user.getEmail());
 
         Long expiration = jwtTokenProvider.getExpiration(accessToken);
         redisService.addTokenToBlacklist(accessToken, expiration);
