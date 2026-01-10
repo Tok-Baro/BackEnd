@@ -1,9 +1,6 @@
 package com.api.tokbaro.domain.user.service;
 
-import com.api.tokbaro.domain.user.entity.ProviderType;
-import com.api.tokbaro.domain.user.entity.Role;
-import com.api.tokbaro.domain.user.entity.User;
-import com.api.tokbaro.domain.user.entity.UserStatus;
+import com.api.tokbaro.domain.user.entity.*;
 import com.api.tokbaro.domain.user.repository.UserRepository;
 import com.api.tokbaro.domain.user.web.dto.*;
 import com.api.tokbaro.global.constant.StaticValue;
@@ -29,15 +26,24 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
+    private final ConsentValidator consentValidator;
 
     @Override
     @Transactional
     public void signUp(SignUpUserReq signUpUserReq) {
 
-        //유저가 존재하는지 검증
+        //유저가 존재하는지 이메일로 검증
         if(userRepository.existsByEmail(signUpUserReq.getEmail())){
             throw new CustomException(UserErrorResponseCode.DUPLICATE_EMAIL_409);
         }
+
+        //닉네임 중복 검즘
+        if(userRepository.existsByNickname(signUpUserReq.getNickname())){
+            throw new CustomException(UserErrorResponseCode.DUPLICATE_NICKNAME_409);
+        }
+
+        //동의 여부 검증
+        consentValidator.validate(signUpUserReq.getConsents());
 
         //비밀번호 암호화 및 사용자 생성
         User user = User.builder()
@@ -48,6 +54,16 @@ public class UserServiceImpl implements UserService {
                 .provider(ProviderType.EMAIL)
                 .status(UserStatus.ACTIVE)
                 .build();
+
+        //동의 항목 처리
+        signUpUserReq.getConsents().forEach(consentDto -> {
+            UserConsent consent = UserConsent.builder()
+                    .consentType(consentDto.getConsentType())
+                    .isAgreed(consentDto.getIsAgreed())
+                    .agreedAt(consentDto.getIsAgreed() ? LocalDateTime.now() : null)
+                    .build();
+            user.addConsent(consent);
+        });
 
         //사용자 저장
         userRepository.save(user);
