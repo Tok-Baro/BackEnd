@@ -63,7 +63,7 @@ public class User extends BaseEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Attendance> attendanceList =  new ArrayList<>(); //출석테이블과 매핑
+    private List<Attendance> attendanceList = new ArrayList<>(); //출석테이블과 매핑
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private ContentData contentData; //콘텐츠데이터 테이블과 매핑
@@ -82,6 +82,14 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Device> devices = new ArrayList<>();
 
+    @Builder.Default
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> followerList = new ArrayList<>(); //내가 팔로우하는 사람들의 목록
+
+    @Builder.Default
+    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> followingList = new ArrayList<>(); //나를 팔로우하는 사람들의 목록
+
     //setter
     public void setUserProfile(Userprofile userProfile) {
         this.userProfile = userProfile;
@@ -99,6 +107,11 @@ public class User extends BaseEntity {
     public void addAttendance(Attendance attendance) {
         this.attendanceList.add(attendance);
         attendance.setUser(this);
+    }
+
+    public void addConsent(UserConsent consent) {
+        this.consents.add(consent);
+        consent.setUser(this);
     }
 
     public void setContentData(ContentData contentData) {
