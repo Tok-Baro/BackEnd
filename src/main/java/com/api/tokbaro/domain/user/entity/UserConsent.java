@@ -35,6 +35,10 @@ public class UserConsent {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    void setUser(User user) {
+        this.user = user;
+    }
+
     @Builder
     public UserConsent(User user, ConsentType consentType, boolean isAgreed, LocalDateTime agreedAt, LocalDateTime withdrawnAt) {
         this.user = user;
