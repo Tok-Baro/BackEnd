@@ -1,7 +1,9 @@
 package com.api.tokbaro.global.config;
 
 import com.api.tokbaro.global.jwt.JwtAuthenticationFilter;
+import com.api.tokbaro.global.jwt.JwtExtractor;
 import com.api.tokbaro.global.jwt.JwtTokenProvider;
+import com.api.tokbaro.global.redis.RedisService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +24,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtExtractor jwtExtractor;
+    private final RedisService redisService;
 
     //비밀번호 암호화
     @Bean
@@ -46,19 +50,18 @@ public class SecurityConfig {
                 //HTTP 요청 인가 규칙 설정
                 .authorizeHttpRequests(authorize -> authorize
                         //아래 경로에 대해서는 인증 없이 접근 허용)
-                        .requestMatchers("/api/users", "/api/login").permitAll()
+                        .requestMatchers("/api/users", "/api/auth/login","/api/auth/applelogin",
+                                "/api/auth/reissue","/api/apns/**").permitAll()
                         .requestMatchers(HttpMethod.POST,"/api/users/me/attendances").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.GET,"/api/users/me/attendances").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST,"/api/users/me/reactions").hasAnyRole("USER","ADMIN")
                         .requestMatchers(HttpMethod.GET,"/api/users/me/reactions").hasAnyRole("USER","ADMIN")
-                        .requestMatchers("/api/apns/**").permitAll()
-                        .requestMatchers("/api/applelogin").permitAll()
-
+                        .requestMatchers("/api/users/me").hasAnyRole("USER","ADMIN")
                         .anyRequest().authenticated()
                 )
 
                 //JwtAuthenticationFilter를 필터체인에 추가
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider, jwtExtractor, redisService), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 }

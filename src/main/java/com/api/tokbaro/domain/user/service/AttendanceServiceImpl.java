@@ -43,9 +43,7 @@ public class AttendanceServiceImpl implements AttendanceService {
         }
 
         //오늘이 첫 출석이라면 새로운 출석 기록 생성
-        Attendance newAttendance = new Attendance();
-        newAttendance.setAttendanceDate(today);
-        newAttendance.setDailyScore(0); //첫 출석이므로 일일 점수는 0점일 것이다.
+        Attendance newAttendance = Attendance.createNewAttendance(user);
 
         user.addAttendance(newAttendance);
         userRepository.save(user);

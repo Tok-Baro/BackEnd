@@ -2,26 +2,24 @@ name: CD
 
 on:
   workflow_run:
-    workflows: ["CI with Gradle"] # CI 워크플로 이름과 정확히 일치해야 함
-    types: [completed] # CI가 끝났을 때 트리거
-    branches: [main] # 특정 브랜치에서만
+    workflows: ["CI with Gradle"]
+    types: [completed]
+    branches: [main]
 
 permissions:
   contents: read
 
 env:
   IMAGE: ${{ secrets.DOCKER_USERNAME }}/tokbaro
+  DOMAIN: tokbaro.com
+  EMAIL: tokbaro.connect@gmail.com
 
 jobs:
   deploy:
     name: Deploy to Server
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      # SSH로 서버에 접속해 배포
-      - name: Deploy over SSH
+      - name: Deploy to Server
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SERVER_HOST }}
@@ -29,19 +27,30 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           port: 22
           script: |
-            echo "${{ secrets.ENV_FILE }}" > /home/${{ secrets.SERVER_USER }}/.env
-            echo "[1/3] Pull latest Docker image..."
-            docker pull ${{ env.IMAGE }}:latest
+            # 1. 서버에 있는 프로젝트 디렉토리로 이동합니다.
+            cd /home/${{ secrets.SERVER_USER }}/BackEnd
 
-            echo "[2/3] Restart container with new image..."
-            docker stop tokbaro || true
-            docker rm tokbaro || true
-            docker run -d --name tokbaro \
-              --env-file /home/${{ secrets.SERVER_USER }}/.env \
-              -p 8080:8080 \
-              -v /opt/apns/keys/AuthKey_R687V74YYB.p8:/app/keys/AuthKey.p8 \
-              ${{ env.IMAGE }}:latest
-            
-            
-            echo "[3/3] Cleanup unused images..."
+            # 2. 이전 배포에서 실행 중이던 컨테이너가 있다면 모두 종료하여 포트 충돌을 방지합니다.
+            echo "Stopping all running containers..."
+            docker-compose down
+
+            # 3. docker-compose.yml 같은 설정 파일 변경을 반영하기 위해 git pull을 실행합니다.
+            echo "Pulling latest configuration files..."
+            git pull origin main
+
+            # 4. GitHub Secret으로부터 .env 파일을 생성합니다.
+            echo "Creating .env file..."
+            echo "${{ secrets.ENV_FILE }}" > .env
+            echo "DOCKER_IMAGE=${{ env.IMAGE }}:latest" >> .env
+
+            # 5. ci.yml에서 빌드한 최신 Docker 이미지를 pull 받습니다.
+            echo "Pulling latest docker image from registry..."
+            docker-compose pull
+
+            # 6. 모든 서비스를 백그라운드에서 시작합니다.
+            echo "Starting all services..."
+            docker-compose up -d
+
+            # 7. 불필요한 Docker 이미지를 정리합니다.
+            echo "Pruning unused docker images..."
             docker image prune -f

@@ -4,6 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class ReactionReq {
-    Long userId;
+    //Long userId;
     double reactionVelocity; //반응속도
 }

@@ -1,4 +1,5 @@
 HELP.md
+GEMINI.md
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
@@ -16,6 +17,8 @@ build/
 bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
+src/main/resources/keys/AuthKey.p8
+src/main/resources/application-local.properties
 
 ### IntelliJ IDEA ###
 .idea
@@ -25,6 +28,7 @@ bin/
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
+src/main/resources/keys/AuthKey.p8
 
 ### NetBeans ###
 /nbproject/private/

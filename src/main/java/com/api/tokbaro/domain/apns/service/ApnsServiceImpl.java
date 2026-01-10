@@ -4,7 +4,6 @@ import com.api.tokbaro.domain.apns.web.dto.ApnsReq;
 import com.api.tokbaro.domain.apns.web.dto.ApnsRes;
 import com.api.tokbaro.domain.apns.web.dto.StateReq;
 import com.eatthepath.pushy.apns.*;
-import com.eatthepath.pushy.apns.util.SimpleApnsPushNotification;
 import com.eatthepath.pushy.apns.util.TokenUtil;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -118,7 +117,7 @@ public class ApnsServiceImpl implements ApnsService {
             return new ApnsRes(500, "페이로드 직렬화 실패 " + e.getMessage());
         }
 
-        log.info("전달된 페이로드: {}", payload);
+        //log.info("전달된 페이로드: {}", payload);
         final com.eatthepath.pushy.apns.DeliveryPriority deliveryPriority = priority == 5 ?
                 com.eatthepath.pushy.apns.DeliveryPriority.CONSERVE_POWER :
                 com.eatthepath.pushy.apns.DeliveryPriority.IMMEDIATE;
@@ -173,7 +172,7 @@ public class ApnsServiceImpl implements ApnsService {
                     apnsClient.sendNotification(notification).get();
 
             if (response.isAccepted()) {
-                log.info("Push notification sent successfully to token: {}", token);
+                //log.info("Push notification sent successfully to token: {}", token);
                 result =  new ApnsRes(200, "성공");
             } else {
                 log.error("Push notification failed for token: {}. Reason: {}", token, response.getRejectionReason());

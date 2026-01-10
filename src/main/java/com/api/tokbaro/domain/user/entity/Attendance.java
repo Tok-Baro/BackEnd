@@ -2,17 +2,13 @@ package com.api.tokbaro.domain.user.entity;
 
 import com.api.tokbaro.global.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 
 /*
@@ -40,16 +36,16 @@ public class Attendance extends BaseEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    //OneToOne으로 유저와 매핑해야할 것 같음.
-//    @OneToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-//    private Boolean monday;
-////    private Boolean tuesday;
-////    private Boolean wednesday;
-////    private Boolean thursday;
-////    private Boolean friday;
-////    private Boolean saturday;
-////    private Boolean sunday;
+    //정적 팩토리 메소드
+    public static Attendance createNewAttendance(User user) {
+        Attendance attendance = new Attendance();
+        attendance.user = user;
+        attendance.dailyScore = 0;
+        attendance.attendanceDate = LocalDate.now();
+        return attendance;
+    }
 }

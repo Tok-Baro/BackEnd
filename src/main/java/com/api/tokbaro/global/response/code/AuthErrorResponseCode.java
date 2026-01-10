@@ -13,7 +13,8 @@ public enum AuthErrorResponseCode implements BaseResponseCode {
     EXPIRED_TOKEN_401("EXPIRED_TOKEN_401", 401, "만료된 JWT 토큰입니다."),
     UNSUPPORTED_TOKEN_401("UNSUPPORTED_TOKEN_401", 401, "지원하지 않는 JWT 토큰입니다."),
     ILLEGAL_ARGUMENT_401("ILLEGAL_ARGUMENT_401", 401, "JWT 클레임 문자열이 비어있습니다."),
-    FORBIDDEN_403("FORBIDDEN_403", 403, "접근 권한이 없습니다.");
+    FORBIDDEN_403("FORBIDDEN_403", 403, "접근 권한이 없습니다."),
+    MANDATORY_TERMS_NOT_AGREED_400("MANDATORY_TERMS_NOT_AGREED_400",400,"필수 약관에 동의해야 회원가입을 완료할 수 있습니다.");
 
     private final String code;
     private final int httpStatus;

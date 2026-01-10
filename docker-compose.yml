@@ -1,0 +1,58 @@
+version: "3.8"
+
+services:
+  springboot-app:
+    build: .
+    image: ${DOCKER_IMAGE:-tokbaro-app}
+    container_name: tokbaro-app
+    depends_on:
+      - redis
+    ports:
+      - "8080:8080"
+    environment:
+      # Docker 내부 네트워크용 변수 (직접 할당)
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+
+      # .env 파일 또는 GitHub Actions Secret으로부터 주입될 변수들
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ACCESS_EXPIRATION=${JWT_ACCESS_EXPIRATION}
+      - JWT_REFRESH_EXPIRATION=${JWT_REFRESH_EXPIRATION}
+      - APNS_TEAM_ID=${APNS_TEAM_ID}
+      - APNS_KEY_ID=${APNS_KEY_ID}
+      - APNS_BUNDLE_ID=${APNS_BUNDLE_ID}
+      - APNS_P8_FILE=${APNS_P8_FILE} # .env 파일에 컨테이너 내부 경로로 지정 필요
+      - APPLE_CLIENT_ID=${APPLE_CLIENT_ID}
+    volumes:
+      # 서버의 절대 경로(/home/ubuntu/secure/keys)를 컨테이너의 /app/keys로 마운트합니다.
+      # EC2 유저명이 ubuntu가 아닌 경우 경로를 수정해야 합니다.
+      - /home/ubuntu/secure/keys:/app/keys
+    networks:
+      - tokbaro-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: tokbaro-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - tokbaro-network
+
+  nginx:
+    image: nginx:stable-alpine
+    container_name: tokbaro-nginx
+    depends_on:
+      - springboot-app
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - tokbaro-network
+
+networks:
+  tokbaro-network:
+    driver: bridge

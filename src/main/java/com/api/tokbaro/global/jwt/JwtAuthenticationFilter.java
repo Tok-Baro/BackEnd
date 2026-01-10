@@ -1,5 +1,6 @@
 package com.api.tokbaro.global.jwt;
 
+import com.api.tokbaro.global.redis.RedisService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,34 +23,45 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public static final String BEARER_PREFIX = "Bearer ";
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final JwtExtractor jwtExtractor;
+    private final RedisService redisService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-        throws IOException, ServletException {
+            throws IOException, ServletException {
 
         //요청 헤더에서 JWT 토큰 추출
-        String jwt = resolveToken(request);
+        String jwt = jwtExtractor.extractAccessToken(request);
 
         //토큰 유효성 검사
-        if(StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
-            //토큰이 유효하면 Authentication 객체를 받아온다.
-            Authentication authentication = jwtTokenProvider.getAuthentication(jwt);
+        if (StringUtils.hasText(jwt) && jwtTokenProvider.validateToken(jwt)) {
 
-            //받아온 Authentication 객체를 SecurityContext에 저장한다.
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            logger.debug("Security Context에 '{}' 인증 정보를 저장했습니다. url: {}", authentication.getName(), request.getRequestURI());
+            if(redisService.isTokenBlacklisted(jwt)){
+                //블랙리스트에 있는지 검사한다.
+                logger.debug("블랙리스트에 등록된 토큰입니다. url: {}", request.getRequestURI());
+            } else {
+                //토큰이 유효하면 Authentication 객체를 받아온다.
+                Authentication authentication = jwtTokenProvider.getAuthentication(jwt);
+
+                //받아온 Authentication 객체를 SecurityContext에 저장한다.
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                logger.debug("Security Context에 '{}' 인증 정보를 저장했습니다. url: {}", authentication.getName(), request.getRequestURI());
+
+                // 오류체크 로그
+                if (authentication != null) {
+                    logger.debug("Authentication object: {}", authentication);
+                    if (authentication.getPrincipal() instanceof UserPrincipal) {
+                        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
+                        logger.debug("UserPrincipal ID: {}", userPrincipal.getId());
+                    } else {
+                        logger.debug("Principal이 UserPrincipal의 인스턴스가 아닙니다. {}", authentication.getPrincipal());
+                    }
+                }
+            }
 
         } else {
             logger.debug("유효한 JWT 토큰이 없습니다. url: {}", request.getRequestURI());
         }
         filterChain.doFilter(request, response);
-    }
-
-    private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        if(StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-            return bearerToken.substring(BEARER_PREFIX.length());
-        }
-        return null;
     }
 }

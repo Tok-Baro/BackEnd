@@ -1,0 +1,15 @@
+# Gradle 캐시
+.gradle/
+
+# IDE 설정
+.idea/
+
+# Git 관련
+.git/
+.gitignore
+
+# Nginx (빌드에 불필요)
+nginx/
+
+# 로그 파일
+*.log

@@ -1,6 +1,6 @@
 package com.api.tokbaro.global.jwt;
 
-import com.api.tokbaro.domain.user.web.dto.SignInUserRes;
+import com.api.tokbaro.domain.auth.web.dto.SignInUserRes;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -15,6 +15,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -71,11 +72,13 @@ public class JwtTokenProvider implements InitializingBean {
     }
 
     private String createRefreshToken(Authentication authentication) {
+        UserPrincipal userPrincipal = (UserPrincipal) authentication.getPrincipal();
         long now = (new Date()).getTime();
         Date validity = new Date(now + this.refreshTokenValidity);
 
         return Jwts.builder()
                 .setSubject(authentication.getName())
+                .claim("id", userPrincipal.getId())
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(validity)
                 .compact();
@@ -108,14 +111,41 @@ public class JwtTokenProvider implements InitializingBean {
                     .parseClaimsJws(token);
             return true;
         } catch (io.jsonwebtoken.security.SignatureException | MalformedJwtException e){
-            logger.info("잘못된 JWT 서명입니다.");
+            logger.warn("잘못된 JWT 서명입니다.");
         } catch (ExpiredJwtException e){
-            logger.info("만료된 JWT 토큰입니다.");
+            logger.warn("만료된 JWT 토큰입니다.");
         } catch (UnsupportedJwtException e){
-            logger.info("지원되지 않는 JWT 토큰입니다.");
+            logger.warn("지원되지 않는 JWT 토큰입니다.");
         } catch (IllegalArgumentException e){
-            logger.info("JWT 토큰이 잘못되었습니다.");
+            logger.warn("JWT 토큰이 잘못되었습니다.");
         }
         return false;
+    }
+
+    //토큰의 만료시간을 계산하는 메서드
+    public Long getExpiration(String token){
+        Date expiration = Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getExpiration();
+        long now = (new Date()).getTime();
+        return expiration.getTime() - now;
+    }
+
+    //토큰에서 ID를 추출하는 메서드
+    public Long getUserIdFromToken(String token){
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("id",Long.class);
+    }
+
+    //Redis TTL 설정을 위한 getter 메서드
+    public Long getRefreshTokenValidity(){
+        return refreshTokenValidity;
     }
 }

@@ -5,19 +5,16 @@ import com.api.tokbaro.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "users")
-/*
-    기본유저 엔티티
-    나중에 JWT, Spring Security 추가해야함
- */
 public class User extends BaseEntity {
 
     @Id
@@ -25,32 +22,104 @@ public class User extends BaseEntity {
     @Column(name = "user_id")
     private Long id;
 
-    @Column(name = "username")
-    private String username; //회원이름
+    @Column(name = "email", unique = true)
+    private String email; //회원 이메일
+
+    @Column(name = "nickname")
+    private String nickname; //회원닉네임
 
     @Column(name = "password")
     private String password; //회원비밀번호
 
-    @Column(name = "apple_id")
-    private String appleId; //애플 로그인 사용자 고유 ID
+    @Enumerated(EnumType.STRING)
+    @Column(name = "provider", nullable = false)
+    private ProviderType provider; //인증방식 APPLE, KAKAO, EMAIL
 
-    @Column(name = "refresh_token")
-    private String refreshToken;
+    //apple, kakao로 가입했을 때 이메일을 비공개할 수도 있기에 사용자를 식별하는 고유의 키 역할을 한다.
+    @Column(name = "provider_id")
+    private String providerId;
 
-    @Enumerated(EnumType.STRING) //Enum값을 문자열로 저장
+    @Column(name = "profile_image_url")
+    private String profileImageUrl; //회원프로필이미지
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private UserStatus status = UserStatus.ACTIVE;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false)
     private Role role;
 
+    @Builder.Default
+    @Column(name = "follower_count", nullable = false)
+    private Integer followerCount = 0;
 
+    @Builder.Default
+    @Column(name = "following_count", nullable = false)
+    private Integer followingCount = 0;
+
+    @Column(name = "withdrawn_at")
+    private LocalDateTime withdrawnAt; //회원탈퇴시간
+
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Attendance> attendanceList;
+    private List<Attendance> attendanceList = new ArrayList<>(); //출석테이블과 매핑
 
-//    @OneToOne
-//    @JoinColumn(name = "content_data_id")
-//    private ContentData contentData;
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private ContentData contentData; //콘텐츠데이터 테이블과 매핑
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UserConsent> consents = new ArrayList<>(); //각 동의여부 테이블과 매핑
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Userprofile userProfile; //유저프로필정보 테이블과 매핑
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private NotificationSettings notificationSettings;
+
+    @Builder.Default
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Device> devices = new ArrayList<>();
+
+    @Builder.Default
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> followerList = new ArrayList<>(); //내가 팔로우하는 사람들의 목록
+
+    @Builder.Default
+    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> followingList = new ArrayList<>(); //나를 팔로우하는 사람들의 목록
+
+    //setter
+    public void setUserProfile(Userprofile userProfile) {
+        this.userProfile = userProfile;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
+    }
+
+    public void setWithdrawnAt(LocalDateTime withdrawnAt) {
+        this.withdrawnAt = withdrawnAt;
+    }
 
     //연관관계 편의 메서드
     public void addAttendance(Attendance attendance) {
         this.attendanceList.add(attendance);
         attendance.setUser(this);
+    }
+
+    public void addConsent(UserConsent consent) {
+        this.consents.add(consent);
+        consent.setUser(this);
+    }
+
+    public void setContentData(ContentData contentData) {
+        this.contentData = contentData;
+        contentData.setUser(this);
+    }
+
+    public void setNotificationSettings(NotificationSettings notificationSettings) {
+        this.notificationSettings = notificationSettings;
     }
 }
