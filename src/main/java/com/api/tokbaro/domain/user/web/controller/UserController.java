@@ -2,7 +2,6 @@ package com.api.tokbaro.domain.user.web.controller;
 
 import com.api.tokbaro.domain.user.service.UserService;
 import com.api.tokbaro.domain.user.web.dto.*;
-import com.api.tokbaro.global.jwt.JwtExtractor;
 import com.api.tokbaro.global.jwt.UserPrincipal;
 import com.api.tokbaro.global.response.SuccessResponse;
 import lombok.RequiredArgsConstructor;
