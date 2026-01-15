@@ -44,9 +44,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         //오늘이 첫 출석이라면 새로운 출석 기록 생성
         Attendance newAttendance = Attendance.createNewAttendance(user);
+        attendanceRepository.save(newAttendance);
 
-        user.addAttendance(newAttendance);
-        userRepository.save(user);
         return new AttendanceRes(
                 newAttendance.getId(),
                 user.getId(),
