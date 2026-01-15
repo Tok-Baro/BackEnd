@@ -4,10 +4,7 @@ import com.api.tokbaro.domain.content.entity.ContentData;
 import com.api.tokbaro.global.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -61,34 +58,14 @@ public class User extends BaseEntity {
     @Column(name = "withdrawn_at")
     private LocalDateTime withdrawnAt; //회원탈퇴시간
 
-    @Builder.Default
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Attendance> attendanceList = new ArrayList<>(); //출석테이블과 매핑
-
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private ContentData contentData; //콘텐츠데이터 테이블과 매핑
-
-    @Builder.Default
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UserConsent> consents = new ArrayList<>(); //각 동의여부 테이블과 매핑
+    private ContentData contentData;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Userprofile userProfile; //유저프로필정보 테이블과 매핑
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private NotificationSettings notificationSettings;
-
-    @Builder.Default
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Device> devices = new ArrayList<>();
-
-    @Builder.Default
-    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Follow> followerList = new ArrayList<>(); //내가 팔로우하는 사람들의 목록
-
-    @Builder.Default
-    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Follow> followingList = new ArrayList<>(); //나를 팔로우하는 사람들의 목록
 
     //setter
     public void setUserProfile(Userprofile userProfile) {
@@ -101,22 +78,6 @@ public class User extends BaseEntity {
 
     public void setWithdrawnAt(LocalDateTime withdrawnAt) {
         this.withdrawnAt = withdrawnAt;
-    }
-
-    //연관관계 편의 메서드
-    public void addAttendance(Attendance attendance) {
-        this.attendanceList.add(attendance);
-        attendance.setUser(this);
-    }
-
-    public void addConsent(UserConsent consent) {
-        this.consents.add(consent);
-        consent.setUser(this);
-    }
-
-    public void setContentData(ContentData contentData) {
-        this.contentData = contentData;
-        contentData.setUser(this);
     }
 
     public void setNotificationSettings(NotificationSettings notificationSettings) {
