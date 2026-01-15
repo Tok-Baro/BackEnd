@@ -1,6 +1,7 @@
 package com.api.tokbaro.domain.user.service;
 
 import com.api.tokbaro.domain.user.entity.*;
+import com.api.tokbaro.domain.user.repository.UserConsentRepository;
 import com.api.tokbaro.domain.user.repository.UserRepository;
 import com.api.tokbaro.domain.user.web.dto.*;
 import com.api.tokbaro.global.constant.StaticValue;
@@ -15,6 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -27,6 +30,7 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisService redisService;
     private final ConsentValidator consentValidator;
+    private final UserConsentRepository userConsentRepository;
 
     @Override
     @Transactional
@@ -55,18 +59,19 @@ public class UserServiceImpl implements UserService {
                 .status(UserStatus.ACTIVE)
                 .build();
 
-        //동의 항목 처리
-        signUpUserReq.getConsents().forEach(consentDto -> {
-            UserConsent consent = UserConsent.builder()
-                    .consentType(consentDto.getConsentType())
-                    .isAgreed(consentDto.getIsAgreed())
-                    .agreedAt(consentDto.getIsAgreed() ? LocalDateTime.now() : null)
-                    .build();
-            user.addConsent(consent);
-        });
-
         //사용자 저장
         userRepository.save(user);
+
+        //동의 항목 처리
+        List<UserConsent> userConsentList = signUpUserReq.getConsents().stream()
+                .map(consentDto -> UserConsent.builder()
+                        .user(user)
+                        .consentType(consentDto.getConsentType())
+                        .isAgreed(consentDto.getIsAgreed())
+                        .agreedAt(consentDto.getIsAgreed() ? LocalDateTime.now() : null)
+                        .build())
+                .toList();
+        userConsentRepository.saveAll(userConsentList); //한번에 저장한다.
     }
 
     @Override
